@@ -43,6 +43,11 @@ const Navigation = () => {
                   {item.label}
                 </button>
               ))}
+              <Button variant="ghost" size="sm" asChild>
+                <a href="/auth" className="text-foreground hover:text-primary transition-colors duration-300 font-medium">
+                  Admin
+                </a>
+              </Button>
             </div>
           </div>
 
@@ -72,6 +77,12 @@ const Navigation = () => {
                   {item.label}
                 </button>
               ))}
+              <a
+                href="/auth"
+                className="block w-full text-left px-3 py-2 text-foreground hover:text-primary transition-colors duration-300"
+              >
+                Admin
+              </a>
             </div>
           </div>
         )}

@@ -2,46 +2,55 @@ import { ExternalLink, Github } from "lucide-react";
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
+import { useState, useEffect } from "react";
+import { supabase } from "@/integrations/supabase/client";
+
+interface Project {
+  id: string;
+  name: string;
+  description: string;
+  technologies: string[];
+  github?: string;
+  demo?: string;
+  image?: string;
+}
 
 const Projects = () => {
-  const projects = [
-    {
-      id: 1,
-      name: "Streamly",
-      description: "Plataforma de streaming moderna com interface intuitiva e recursos avançados de gerenciamento de conteúdo.",
-      technologies: ["React", "Node.js", "PostgreSQL", "Docker"],
-      github: "https://github.com/charlles-augusto/streamly",
-      demo: "https://streamly-demo.com",
-      image: "/placeholder.svg"
-    },
-    {
-      id: 2,
-      name: "BFD Labs",
-      description: "Laboratório de desenvolvimento de soluções inovadoras focadas em segurança e automação de processos.",
-      technologies: ["Python", "FastAPI", "React", "AI/ML"],
-      github: "https://github.com/charlles-augusto/bfd-labs",
-      demo: "https://bfd-labs.com",
-      image: "/placeholder.svg"
-    },
-    {
-      id: 3,
-      name: "SecureAuth API",
-      description: "Sistema de autenticação robusto com múltiplos fatores e análise de comportamento para detecção de anomalias.",
-      technologies: ["Golang", "JWT", "Redis", "PostgreSQL"],
-      github: "https://github.com/charlles-augusto/secure-auth",
-      demo: null,
-      image: "/placeholder.svg"
-    },
-    {
-      id: 4,
-      name: "CyberMonitor",
-      description: "Dashboard de monitoramento de segurança em tempo real com alertas inteligentes e análise preditiva.",
-      technologies: ["Python", "Django", "React", "WebSocket"],
-      github: "https://github.com/charlles-augusto/cyber-monitor",
-      demo: "https://cyber-monitor-demo.com",
-      image: "/placeholder.svg"
+  const [projects, setProjects] = useState<Project[]>([]);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    fetchProjects();
+  }, []);
+
+  const fetchProjects = async () => {
+    try {
+      const { data, error } = await supabase
+        .from("projects")
+        .select("*")
+        .order("created_at", { ascending: false });
+
+      if (error) throw error;
+      setProjects(data || []);
+    } catch (error) {
+      console.error("Error fetching projects:", error);
+    } finally {
+      setLoading(false);
     }
-  ];
+  };
+
+  if (loading) {
+    return (
+      <section id="projects" className="py-20 bg-muted/20">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="text-center">
+            <div className="animate-spin w-8 h-8 border-4 border-primary border-t-transparent rounded-full mx-auto mb-4"></div>
+            <p>Carregando projetos...</p>
+          </div>
+        </div>
+      </section>
+    );
+  }
 
   return (
     <section id="projects" className="py-20 bg-muted/20">

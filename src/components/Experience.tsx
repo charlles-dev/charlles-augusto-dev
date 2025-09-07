@@ -1,76 +1,55 @@
 import { Calendar, MapPin, Building } from "lucide-react";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
+import { useState, useEffect } from "react";
+import { supabase } from "@/integrations/supabase/client";
+
+interface Experience {
+  id: string;
+  title: string;
+  company: string;
+  period: string;
+  location?: string;
+  description: string;
+  technologies: string[];
+}
 
 const Experience = () => {
-  const experiences = [
-    {
-      id: 1,
-      title: "Senior Full-Stack Developer",
-      company: "Proxxima Telecom",
-      location: "São Paulo, SP",
-      period: "2022 - Presente",
-      description: "Desenvolvimento de soluções escaláveis para telecomunicações com foco em segurança e performance. Liderança técnica em projetos de migração para cloud e implementação de práticas DevSecOps.",
-      technologies: ["Python", "React", "Kubernetes", "AWS", "PostgreSQL"],
-      type: "work"
-    },
-    {
-      id: 2,
-      title: "Cybersecurity Specialist",
-      company: "Projeto Bolsa Futuro Digital",
-      location: "Remote",
-      period: "2021 - 2022",
-      description: "Desenvolvimento de ferramentas de análise de vulnerabilidades e implementação de protocolos de segurança. Criação de dashboards para monitoramento de ameaças em tempo real.",
-      technologies: ["Python", "Django", "Docker", "Redis", "Machine Learning"],
-      type: "project"
-    },
-    {
-      id: 3,
-      title: "Full-Stack Developer",
-      company: "Tech Solutions Ltd",
-      location: "Rio de Janeiro, RJ",
-      period: "2020 - 2021",
-      description: "Desenvolvimento de aplicações web robustas e APIs RESTful. Colaboração em equipes ágeis para entrega de produtos de alta qualidade.",
-      technologies: ["Java", "Spring Boot", "React", "MySQL", "Docker"],
-      type: "work"
-    },
-    {
-      id: 4,
-      title: "Bacharelado em Ciência da Computação",
-      company: "Universidade Federal do Rio de Janeiro",
-      location: "Rio de Janeiro, RJ",
-      period: "2017 - 2020",
-      description: "Formação sólida em fundamentos da computação com foco em segurança da informação e desenvolvimento de software.",
-      technologies: ["Algoritmos", "Estrutura de Dados", "Redes", "Segurança"],
-      type: "education"
-    }
-  ];
+  const [experiences, setExperiences] = useState<Experience[]>([]);
+  const [loading, setLoading] = useState(true);
 
-  const getIconByType = (type: string) => {
-    switch (type) {
-      case "work":
-        return <Building className="w-5 h-5 text-primary" />;
-      case "project":
-        return <Building className="w-5 h-5 text-secondary" />;
-      case "education":
-        return <Building className="w-5 h-5 text-accent" />;
-      default:
-        return <Building className="w-5 h-5 text-muted-foreground" />;
+  useEffect(() => {
+    fetchExperiences();
+  }, []);
+
+  const fetchExperiences = async () => {
+    try {
+      const { data, error } = await supabase
+        .from("experiences")
+        .select("*")
+        .order("created_at", { ascending: false });
+
+      if (error) throw error;
+      setExperiences(data || []);
+    } catch (error) {
+      console.error("Error fetching experiences:", error);
+    } finally {
+      setLoading(false);
     }
   };
 
-  const getBorderColor = (type: string) => {
-    switch (type) {
-      case "work":
-        return "border-l-primary";
-      case "project":
-        return "border-l-secondary";
-      case "education":
-        return "border-l-accent";
-      default:
-        return "border-l-muted";
-    }
-  };
+  if (loading) {
+    return (
+      <section id="experience" className="py-20">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="text-center">
+            <div className="animate-spin w-8 h-8 border-4 border-primary border-t-transparent rounded-full mx-auto mb-4"></div>
+            <p>Carregando experiências...</p>
+          </div>
+        </div>
+      </section>
+    );
+  }
 
   return (
     <section id="experience" className="py-20 bg-background">
@@ -96,12 +75,12 @@ const Experience = () => {
                 style={{ animationDelay: `${index * 0.2}s` }}
               >
                 {/* Timeline dot */}
-                <div className={`flex-shrink-0 w-16 h-16 rounded-full border-4 ${getBorderColor(exp.type)} bg-background flex items-center justify-center z-10`}>
-                  {getIconByType(exp.type)}
+                <div className={`flex-shrink-0 w-16 h-16 rounded-full border-4 border-primary bg-background flex items-center justify-center z-10`}>
+                  <Building className="w-5 h-5 text-primary" />
                 </div>
 
                 {/* Content */}
-                <Card className={`ml-8 flex-1 hover:shadow-tech transition-all duration-300 bg-gradient-card border-l-4 ${getBorderColor(exp.type)}`}>
+                <Card className={`ml-8 flex-1 hover:shadow-tech transition-all duration-300 bg-gradient-card border-l-4 border-l-primary`}>
                   <CardHeader>
                     <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-2">
                       <CardTitle className="text-xl text-foreground">{exp.title}</CardTitle>
@@ -114,10 +93,12 @@ const Experience = () => {
                       <Building className="w-4 h-4 mr-2" />
                       {exp.company}
                     </div>
-                    <div className="flex items-center text-sm text-muted-foreground">
-                      <MapPin className="w-4 h-4 mr-1" />
-                      {exp.location}
-                    </div>
+                    {exp.location && (
+                      <div className="flex items-center text-sm text-muted-foreground">
+                        <MapPin className="w-4 h-4 mr-1" />
+                        {exp.location}
+                      </div>
+                    )}
                   </CardHeader>
                   
                   <CardContent>
