@@ -1,0 +1,108 @@
+{
+  "dashboard": {
+    "name": "Infrastructure Performance Dashboard",
+    "description": "Monitor CDN performance and auto-scaling metrics",
+    "widgets": [
+      {
+        "type": "metric",
+        "title": "Response Time (P95)",
+        "metric": "vercel.response_time_p95",
+        "unit": "ms",
+        "thresholds": {
+          "warning": 1000,
+          "critical": 2000
+        }
+      },
+      {
+        "type": "metric",
+        "title": "Active Instances",
+        "metric": "vercel.active_instances",
+        "unit": "count",
+        "thresholds": {
+          "warning": 8,
+          "critical": 10
+        }
+      },
+      {
+        "type": "metric",
+        "title": "CPU Utilization",
+        "metric": "vercel.cpu_utilization",
+        "unit": "percent",
+        "thresholds": {
+          "warning": 80,
+          "critical": 90
+        }
+      },
+      {
+        "type": "metric",
+        "title": "Memory Utilization",
+        "metric": "vercel.memory_utilization",
+        "unit": "percent",
+        "thresholds": {
+          "warning": 80,
+          "critical": 90
+        }
+      },
+
+      {
+        "type": "timeseries",
+        "title": "Request Rate",
+        "metrics": ["vercel.requests"],
+        "unit": "requests/min"
+      },
+      {
+        "type": "timeseries",
+        "title": "Error Rate",
+        "metrics": ["vercel.errors"],
+        "unit": "errors/min"
+      },
+      {
+        "type": "alert",
+        "title": "Scaling Events",
+        "conditions": [
+          {
+            "metric": "vercel.scaling_events",
+            "operator": "greater_than",
+            "value": 0,
+            "duration": "5m"
+          }
+        ]
+      }
+    ],
+    "alerts": [
+      {
+        "name": "High Response Time",
+        "metric": "vercel.response_time_p95",
+        "operator": "greater_than",
+        "value": 2000,
+        "duration": "5m",
+        "severity": "warning",
+        "message": "Response time is high: {{value}}ms"
+      },
+      {
+        "name": "Max Instances Reached",
+        "metric": "vercel.active_instances",
+        "operator": "greater_than_or_equal",
+        "value": 10,
+        "duration": "2m",
+        "severity": "critical",
+        "message": "Maximum instances reached: {{value}}"
+      },
+      {
+        "name": "High Error Rate",
+        "metric": "vercel.errors",
+        "operator": "greater_than",
+        "value": 10,
+        "duration": "5m",
+        "severity": "critical",
+        "message": "High error rate detected: {{value}} errors/min"
+      }
+    ],
+    "integrations": {
+      "vercel": {
+        "project_id": "charlles-augusto-dev",
+        "token": "your-vercel-token"
+      }
+    }
+  }
+}

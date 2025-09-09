@@ -1,0 +1,48 @@
+{
+  "auto_scaling": {
+    "provider": "vercel",
+    "enabled": true,
+    "min_instances": 1,
+    "max_instances": 10,
+    "target_cpu_utilization": 70,
+    "target_memory_utilization": 80,
+    "scale_triggers": {
+      "cpu": {
+        "metric": "cpu_utilization",
+        "threshold": 70,
+        "scale_up_cooldown": 60,
+        "scale_down_cooldown": 300
+      },
+      "memory": {
+        "metric": "memory_utilization",
+        "threshold": 80,
+        "scale_up_cooldown": 60,
+        "scale_down_cooldown": 300
+      },
+      "requests": {
+        "metric": "requests_per_second",
+        "threshold": 100,
+        "scale_up_cooldown": 30,
+        "scale_down_cooldown": 180
+      },
+      "response_time": {
+        "metric": "response_time_p95",
+        "threshold": 2000,
+        "scale_up_cooldown": 60,
+        "scale_down_cooldown": 300
+      }
+    },
+    "health_checks": {
+      "enabled": true,
+      "path": "/health",
+      "interval": 30,
+      "timeout": 5,
+      "healthy_threshold": 2,
+      "unhealthy_threshold": 3
+    },
+    "notifications": {
+      "email": "charlles.augusto@gmail.com",
+      "webhook": "https://hooks.slack.com/services/YOUR/SLACK/WEBHOOK"
+    }
+  }
+}

@@ -1,0 +1,105 @@
+{
+  "common": {
+    "loading": "Carregando...",
+    "error": "Erro ao carregar dados",
+    "retry": "Tentar novamente",
+    "save": "Salvar",
+    "cancel": "Cancelar",
+    "delete": "Excluir",
+    "edit": "Editar",
+    "add": "Adicionar",
+    "close": "Fechar",
+    "confirm": "Confirmar",
+    "saveSuccess": "Salvo com sucesso!",
+    "deleteSuccess": "Excluído com sucesso!",
+    "errorOccurred": "Ocorreu um erro"
+  },
+  "navigation": {
+    "home": "Início",
+    "about": "Sobre",
+    "projects": "Projetos",
+    "experience": "Experiência",
+    "education": "Educação",
+    "contact": "Contato",
+    "admin": "Admin"
+  },
+  "hero": {
+    "greeting": "Olá, eu sou",
+    "name": "Charlles Augusto",
+    "title": "Desenvolvedor Full Stack",
+    "subtitle": "Transformando ideias em experiências digitais excepcionais",
+    "description": "Especializado em React, Node.js e tecnologias modernas, crio soluções escaláveis e centradas no usuário.",
+    "cta": "Ver meus projetos"
+  },
+  "about": {
+    "title": "Sobre Mim",
+    "description": "Sou um desenvolvedor full stack apaixonado por criar soluções web elegantes e funcionais. Com experiência em React, Node.js e tecnologias modernas, meu foco é construir aplicações que não apenas funcionem perfeitamente, mas também proporcionem uma experiência excepcional ao usuário.",
+    "skills": "Minhas Habilidades",
+    "technologies": "Tecnologias"
+  },
+  "projects": {
+    "title": "Projetos",
+    "subtitle": "Meus trabalhos recentes",
+    "empty": "Nenhum projeto encontrado",
+    "viewProject": "Ver Projeto",
+    "viewCode": "Ver Código",
+    "technologies": "Tecnologias",
+    "featured": "Em Destaque",
+    "draft": "Rascunho",
+    "published": "Publicado"
+  },
+  "experience": {
+    "title": "Experiência Profissional",
+    "subtitle": "Minha jornada profissional",
+    "empty": "Nenhuma experiência encontrada",
+    "present": "Atualmente",
+    "responsibilities": "Responsabilidades",
+    "achievements": "Conquistas"
+  },
+  "education": {
+    "title": "Educação",
+    "subtitle": "Minha formação acadêmica",
+    "empty": "Nenhuma formação encontrada",
+    "degree": "Formação",
+    "institution": "Instituição",
+    "period": "Período"
+  },
+  "contact": {
+    "title": "Entre em Contato",
+    "subtitle": "Vamos trabalhar juntos",
+    "email": "Email",
+    "phone": "Telefone",
+    "location": "Localização",
+    "sendMessage": "Enviar Mensagem",
+    "messageSent": "Mensagem enviada com sucesso!"
+  },
+  "admin": {
+    "title": "Painel Administrativo",
+    "login": "Entrar",
+    "logout": "Sair",
+    "dashboard": "Dashboard",
+    "manageProjects": "Gerenciar Projetos",
+    "manageExperience": "Gerenciar Experiência",
+    "manageEducation": "Gerenciar Educação",
+    "addNew": "Adicionar Novo",
+    "editItem": "Editar Item",
+    "deleteItem": "Excluir Item",
+    "confirmDelete": "Tem certeza que deseja excluir este item?",
+    "dragToReorder": "Arraste para reordenar",
+    "bulkActions": "Ações em Massa",
+    "selectAll": "Selecionar Todos",
+    "deselectAll": "Desmarcar Todos",
+    "duplicate": "Duplicar",
+    "publish": "Publicar",
+    "unpublish": "Despublicar",
+    "markAsFeatured": "Marcar como Destaque",
+    "removeFromFeatured": "Remover dos Destaques"
+  },
+  "validation": {
+    "required": "Este campo é obrigatório",
+    "email": "Por favor, insira um email válido",
+    "url": "Por favor, insira uma URL válida",
+    "minLength": "Mínimo de {{count}} caracteres",
+    "maxLength": "Máximo de {{count}} caracteres"
+  }
+}

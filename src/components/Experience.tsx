@@ -2,27 +2,33 @@ import { Calendar, MapPin, Building } from "lucide-react";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { useState, useEffect } from "react";
-import { supabase } from "@/integrations/supabase/client";
+import { supabase } from "@/lib/supabase";
 import { motion } from "framer-motion";
+import { useReducedMotion } from "@/hooks/use-reduced-motion";
+import { useErrorHandler } from "@/hooks/useErrorHandler";
 
 interface Experience {
   id: string;
   title: string;
   company: string;
   period: string;
-  location?: string;
+  location?: string | null;
   description: string;
-  technologies: string[];
+  technologies: string[] | null;
+  display_order: number;
 }
 
 const Experience = () => {
   const [experiences, setExperiences] = useState<Experience[]>([]);
   const [loading, setLoading] = useState(true);
   const [activeIndex, setActiveIndex] = useState<number | null>(null);
+  const reducedMotion = useReducedMotion();
+
+  const { handleError } = useErrorHandler();
 
   useEffect(() => {
     fetchExperiences();
-  }, []);
+  }, [handleError]);
 
   const fetchExperiences = async () => {
     try {
@@ -31,10 +37,17 @@ const Experience = () => {
         .select("*")
         .order("display_order", { ascending: true });
 
-      if (error) throw error;
-      setExperiences(data || []);
+      if (error) {
+        handleError(error, { 
+          fallbackMessage: 'Erro ao carregar experiências. Tente novamente mais tarde.' 
+        });
+      } else {
+        setExperiences(data || []);
+      }
     } catch (error) {
-      console.error("Error fetching experiences:", error);
+      handleError(error, { 
+        fallbackMessage: 'Erro inesperado ao carregar experiências.' 
+      });
     } finally {
       setLoading(false);
     }
@@ -42,11 +55,37 @@ const Experience = () => {
 
   if (loading) {
     return (
-      <section id="experience" className="py-20">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="text-center">
+      <section id="experience" className="py-20 px-4">
+        <div className="max-w-6xl mx-auto">
+          <div className="text-center mb-16">
             <div className="animate-spin w-8 h-8 border-4 border-primary border-t-transparent rounded-full mx-auto mb-4"></div>
-            <p>Carregando experiências...</p>
+            <p className="text-muted-foreground">Carregando experiências...</p>
+          </div>
+          <div className="relative">
+            <div className="absolute left-8 top-0 w-0.5 bg-gradient-to-b from-primary via-secondary to-accent h-full"></div>
+            <div className="space-y-8">
+              {[...Array(3)].map((_, i) => (
+                <div key={i} className="relative flex items-start">
+                  <div className="flex-shrink-0 w-16 h-16 bg-gray-200 dark:bg-gray-700 rounded-full animate-pulse"></div>
+                  <div className="ml-8 flex-1">
+                    <div className="bg-card/50 backdrop-blur-sm rounded-lg p-6 border border-border/20">
+                      <div className="h-5 bg-gray-200 dark:bg-gray-700 rounded w-3/4 mb-2 animate-pulse"></div>
+                      <div className="h-4 bg-gray-200 dark:bg-gray-700 rounded w-1/2 mb-2 animate-pulse"></div>
+                      <div className="h-4 bg-gray-200 dark:bg-gray-700 rounded w-1/3 mb-4 animate-pulse"></div>
+                      <div className="space-y-2 mb-4">
+                        <div className="h-4 bg-gray-200 dark:bg-gray-700 rounded w-full animate-pulse"></div>
+                        <div className="h-4 bg-gray-200 dark:bg-gray-700 rounded w-5/6 animate-pulse"></div>
+                      </div>
+                      <div className="flex flex-wrap gap-2">
+                        {[...Array(4)].map((_, j) => (
+                          <div key={j} className="h-6 bg-gray-200 dark:bg-gray-700 rounded w-16 animate-pulse"></div>
+                        ))}
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              ))}
+            </div>
           </div>
         </div>
       </section>
@@ -99,19 +138,19 @@ const Experience = () => {
                 onMouseLeave={() => setActiveIndex(null)}
               >
                 {/* Enhanced Timeline dot */}
-                <motion.div 
-                  className="flex-shrink-0 w-16 h-16 rounded-full border-4 border-primary bg-background flex items-center justify-center z-10 relative overflow-hidden"
-                  whileHover={{ scale: 1.1 }}
-                  animate={activeIndex === index ? { scale: 1.1 } : { scale: 1 }}
-                  transition={{ type: "spring", stiffness: 300 }}
-                >
-                  <motion.div
-                    className="absolute inset-0 bg-gradient-to-r from-primary/20 to-secondary/20 opacity-0"
-                    animate={activeIndex === index ? { opacity: 1 } : { opacity: 0 }}
-                    transition={{ duration: 0.3 }}
-                  />
-                  <Building className="w-5 h-5 text-primary relative z-10" />
-                </motion.div>
+                <motion.div
+                      className="flex-shrink-0 w-16 h-16 rounded-full border-4 border-primary bg-background flex items-center justify-center z-10 relative overflow-hidden"
+                      whileHover={{ scale: 1.1 }}
+                      animate={activeIndex === index ? { scale: 1.1 } : { scale: 1 }}
+                      transition={{ type: "spring", stiffness: 300 }}
+                    >
+                      <motion.div
+                        className="absolute inset-0 bg-gradient-to-r from-primary/20 to-secondary/20 opacity-0"
+                        animate={activeIndex === index ? { opacity: 1 } : { opacity: 0 }}
+                        transition={{ duration: 0.3 }}
+                      />
+                      <Building className="w-5 h-5 text-primary relative z-10" />
+                    </motion.div>
 
                 {/* Enhanced Content */}
                 <motion.div
@@ -165,7 +204,7 @@ const Experience = () => {
                         {exp.description}
                       </CardDescription>
                       
-                      <motion.div 
+                      {exp.technologies && <motion.div 
                         className="flex flex-wrap gap-2"
                         initial={{ opacity: 0 }}
                         whileInView={{ opacity: 1 }}
@@ -189,7 +228,7 @@ const Experience = () => {
                             </Badge>
                           </motion.div>
                         ))}
-                      </motion.div>
+                      </motion.div>}
                     </CardContent>
                   </Card>
                 </motion.div>

@@ -60,6 +60,8 @@ export default {
         'tech': 'var(--shadow-tech)',
       },
       fontFamily: {
+        sans: ["Inter", "system-ui", "sans-serif"],
+        serif: ["Playfair Display", "Georgia", "serif"],
         mono: ['JetBrains Mono', 'Monaco', 'Cascadia Code', 'Segoe UI Mono', 'monospace'],
       },
       borderRadius: {
