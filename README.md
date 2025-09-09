@@ -1,73 +1,89 @@
-# Welcome to your Lovable project
+# Charlles Augusto - Portfólio Pessoal
 
-## Project info
+![React](https://img.shields.io/badge/React-20232A?style=for-the-badge&logo=react&logoColor=61DAFB)
+![TypeScript](https://img.shields.io/badge/TypeScript-007ACC?style=for-the-badge&logo=typescript&logoColor=white)
+![TailwindCSS](https://img.shields.io/badge/Tailwind_CSS-38B2AC?style=for-the-badge&logo=tailwind-css&logoColor=white)
+![Supabase](https://img.shields.io/badge/Supabase-3ECF8E?style=for-the-badge&logo=supabase&logoColor=white)
+![Vercel](https://img.shields.io/badge/Vercel-000000?style=for-the-badge&logo=vercel&logoColor=white)
 
-**URL**: https://lovable.dev/projects/638c5cc3-71fe-4ce6-9606-3ef0171935f8
+Este é o repositório do meu portfólio pessoal, desenvolvido para apresentar meus projetos, experiência profissional e habilidades como Desenvolvedor Full-Stack com foco em Cybersecurity.
 
-## How can I edit this code?
+### [➡️ Acesse a versão ao vivo](https://SEU_DOMINIO_AQUI.com)
 
-There are several ways of editing your application.
+---
 
-**Use Lovable**
+## ✨ Recursos
 
-Simply visit the [Lovable Project](https://lovable.dev/projects/638c5cc3-71fe-4ce6-9606-3ef0171935f8) and start prompting.
+- **Design Responsivo:** Totalmente adaptado para desktops, tablets e dispositivos móveis.
+- **Conteúdo Dinâmico:** Projetos, experiências e formação acadêmica são gerenciados via Supabase.
+- **Painel Administrativo:** Uma área segura (`/admin`) para gerenciar todo o conteúdo do portfólio de forma intuitiva.
+- **Animações Modernas:** Animações sutis com `Framer Motion` para uma experiência de usuário mais fluida e agradável.
+- **Tema Dark:** Interface elegante com um tema escuro como padrão.
+- **Internacionalização:** Suporte para múltiplos idiomas (Português e Inglês).
 
-Changes made via Lovable will be committed automatically to this repo.
+---
 
-**Use your preferred IDE**
+## 🛠️ Stack de Tecnologia
 
-If you want to work locally using your own IDE, you can clone this repo and push changes. Pushed changes will also be reflected in Lovable.
+| Categoria              | Tecnologia                                                              |
+| ---------------------- | ----------------------------------------------------------------------- |
+| **Frontend**           | [React](https://react.dev/), [Vite](https://vitejs.dev/), [TypeScript](https://www.typescriptlang.org/) |
+| **Estilização**        | [Tailwind CSS](https://tailwindcss.com/), [shadcn/ui](https://ui.shadcn.com/) |
+| **Animações**          | [Framer Motion](https://www.framer.com/motion/)                         |
+| **Backend & Database** | [Supabase](https://supabase.io/) (PostgreSQL, Auth, Storage)            |
+| **Gerenciamento de Estado** | [TanStack Query](https://tanstack.com/query/latest) (React Query)       |
+| **Roteamento**         | [React Router](https://reactrouter.com/)                                |
+| **Deploy**             | [Vercel](https://vercel.com/)                                           |
 
-The only requirement is having Node.js & npm installed - [install with nvm](https://github.com/nvm-sh/nvm#installing-and-updating)
+---
 
-Follow these steps:
+## 🚀 Como Executar Localmente
 
-```sh
-# Step 1: Clone the repository using the project's Git URL.
-git clone <YOUR_GIT_URL>
+Siga os passos abaixo para configurar e executar o projeto em seu ambiente de desenvolvimento.
 
-# Step 2: Navigate to the project directory.
-cd <YOUR_PROJECT_NAME>
+### Pré-requisitos
 
-# Step 3: Install the necessary dependencies.
-npm i
+- [Node.js](https://nodejs.org/en) (versão 18 ou superior)
+- [npm](https://www.npmjs.com/) ou [pnpm](https://pnpm.io/)
 
-# Step 4: Start the development server with auto-reloading and an instant preview.
-npm run dev
-```
+### Instalação
 
-**Edit a file directly in GitHub**
+1.  **Clone o repositório:**
+    ```bash
+    git clone https://github.com/seu-usuario/seu-repositorio.git
+    cd seu-repositorio
+    ```
 
-- Navigate to the desired file(s).
-- Click the "Edit" button (pencil icon) at the top right of the file view.
-- Make your changes and commit the changes.
+2.  **Instale as dependências:**
+    ```bash
+    npm install
+    ```
 
-**Use GitHub Codespaces**
+3.  **Configure as variáveis de ambiente:**
+    - Crie uma cópia do arquivo `.env.example` e renomeie para `.env`.
+      ```bash
+      cp .env.example .env
+      ```
+    - Abra o arquivo `.env` e adicione suas credenciais do Supabase. Você pode encontrá-las no painel do seu projeto em **Settings > API**.
 
-- Navigate to the main page of your repository.
-- Click on the "Code" button (green button) near the top right.
-- Select the "Codespaces" tab.
-- Click on "New codespace" to launch a new Codespace environment.
-- Edit files directly within the Codespace and commit and push your changes once you're done.
+4.  **Execute o servidor de desenvolvimento:**
+    ```bash
+    npm run dev
+    ```
 
-## What technologies are used for this project?
+O projeto estará disponível em `http://localhost:8080`.
 
-This project is built with:
+---
 
-- Vite
-- TypeScript
-- React
-- shadcn-ui
-- Tailwind CSS
+## 🔐 Painel Administrativo
 
-## How can I deploy this project?
+O portfólio possui uma área de administração para gerenciar o conteúdo dinâmico.
 
-Simply open [Lovable](https://lovable.dev/projects/638c5cc3-71fe-4ce6-9606-3ef0171935f8) and click on Share -> Publish.
+- **Acesso:** Navegue para `/auth` para criar uma conta ou fazer login.
+- **Gerenciamento:** Após o login, você será redirecionado para `/admin`, onde poderá adicionar, editar, reordenar e excluir projetos, experiências e formações.
 
-## Can I connect a custom domain to my Lovable project?
+---
 
-Yes, you can!
+## 🚀 Deploy
 
-To connect a domain, navigate to Project > Settings > Domains and click Connect Domain.
-
-Read more here: [Setting up a custom domain](https://docs.lovable.dev/tips-tricks/custom-domain#step-by-step-guide)
+Este projeto está configurado para deploy contínuo na [Vercel](https://vercel.com/). Qualquer push para a branch `main` acionará um novo build e deploy automaticamente.
