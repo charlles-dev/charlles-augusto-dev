@@ -7,7 +7,7 @@ import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { Badge } from "@/components/ui/badge";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
-import { Plus, Edit, Trash2, ExternalLink, Github } from "lucide-react";
+import { Plus, Edit, Trash2, ExternalLink, Github, ArrowUp, ArrowDown } from "lucide-react";
 import { toast } from "@/hooks/use-toast";
 
 interface Project {
@@ -18,6 +18,7 @@ interface Project {
   github?: string;
   demo?: string;
   image?: string;
+  display_order: number;
   created_at: string;
   updated_at: string;
 }
@@ -35,7 +36,8 @@ const ProjectsManager = () => {
     technologies: "",
     github: "",
     demo: "",
-    image: ""
+    image: "",
+    display_order: 0
   });
 
   useEffect(() => {
@@ -47,7 +49,7 @@ const ProjectsManager = () => {
       const { data, error } = await supabase
         .from("projects")
         .select("*")
-        .order("created_at", { ascending: false });
+        .order("display_order", { ascending: true });
 
       if (error) throw error;
       setProjects(data || []);
@@ -73,6 +75,7 @@ const ProjectsManager = () => {
         github: formData.github || null,
         demo: formData.demo || null,
         image: formData.image || null,
+        display_order: Number(formData.display_order),
       };
 
       if (editingProject) {
@@ -120,7 +123,8 @@ const ProjectsManager = () => {
       technologies: project.technologies.join(", "),
       github: project.github || "",
       demo: project.demo || "",
-      image: project.image || ""
+      image: project.image || "",
+      display_order: project.display_order
     });
     setIsDialogOpen(true);
   };
@@ -151,6 +155,58 @@ const ProjectsManager = () => {
     }
   };
 
+  const handleMoveUp = async (project: Project) => {
+    const currentIndex = projects.findIndex(p => p.id === project.id);
+    if (currentIndex <= 0) return;
+
+    const previousProject = projects[currentIndex - 1];
+    
+    try {
+      await Promise.all([
+        supabase.from('projects').update({ display_order: previousProject.display_order }).eq('id', project.id),
+        supabase.from('projects').update({ display_order: project.display_order }).eq('id', previousProject.id)
+      ]);
+      
+      await fetchProjects();
+      toast({
+        title: "Sucesso",
+        description: "Ordem alterada com sucesso!",
+      });
+    } catch (error: any) {
+      toast({
+        title: "Erro ao alterar ordem",
+        description: error.message,
+        variant: "destructive",
+      });
+    }
+  };
+
+  const handleMoveDown = async (project: Project) => {
+    const currentIndex = projects.findIndex(p => p.id === project.id);
+    if (currentIndex >= projects.length - 1) return;
+
+    const nextProject = projects[currentIndex + 1];
+    
+    try {
+      await Promise.all([
+        supabase.from('projects').update({ display_order: nextProject.display_order }).eq('id', project.id),
+        supabase.from('projects').update({ display_order: project.display_order }).eq('id', nextProject.id)
+      ]);
+      
+      await fetchProjects();
+      toast({
+        title: "Sucesso",
+        description: "Ordem alterada com sucesso!",
+      });
+    } catch (error: any) {
+      toast({
+        title: "Erro ao alterar ordem",
+        description: error.message,
+        variant: "destructive",
+      });
+    }
+  };
+
   const resetForm = () => {
     setFormData({
       name: "",
@@ -158,7 +214,8 @@ const ProjectsManager = () => {
       technologies: "",
       github: "",
       demo: "",
-      image: ""
+      image: "",
+      display_order: projects.length
     });
     setEditingProject(null);
   };
@@ -248,6 +305,16 @@ const ProjectsManager = () => {
                   placeholder="https://example.com/image.jpg"
                 />
               </div>
+              <div className="space-y-2">
+                <Label htmlFor="display_order">Ordem de Exibição</Label>
+                <Input
+                  id="display_order"
+                  type="number"
+                  value={formData.display_order}
+                  onChange={(e) => setFormData({...formData, display_order: Number(e.target.value)})}
+                  min="0"
+                />
+              </div>
               <div className="flex justify-end space-x-2">
                 <Button 
                   type="button" 
@@ -272,6 +339,22 @@ const ProjectsManager = () => {
               <div className="flex justify-between items-start">
                 <CardTitle className="text-lg">{project.name}</CardTitle>
                 <div className="flex space-x-1">
+                  <Button 
+                    variant="ghost" 
+                    size="sm"
+                    onClick={() => handleMoveUp(project)}
+                    disabled={projects.findIndex(p => p.id === project.id) === 0}
+                  >
+                    <ArrowUp className="w-4 h-4" />
+                  </Button>
+                  <Button 
+                    variant="ghost" 
+                    size="sm"
+                    onClick={() => handleMoveDown(project)}
+                    disabled={projects.findIndex(p => p.id === project.id) === projects.length - 1}
+                  >
+                    <ArrowDown className="w-4 h-4" />
+                  </Button>
                   <Button 
                     variant="ghost" 
                     size="sm"

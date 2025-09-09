@@ -14,11 +14,54 @@ export type Database = {
   }
   public: {
     Tables: {
+      education: {
+        Row: {
+          created_at: string
+          degree: string
+          description: string | null
+          display_order: number
+          field_of_study: string
+          gpa: string | null
+          id: string
+          institution: string
+          location: string | null
+          period: string
+          updated_at: string
+        }
+        Insert: {
+          created_at?: string
+          degree: string
+          description?: string | null
+          display_order?: number
+          field_of_study: string
+          gpa?: string | null
+          id?: string
+          institution: string
+          location?: string | null
+          period: string
+          updated_at?: string
+        }
+        Update: {
+          created_at?: string
+          degree?: string
+          description?: string | null
+          display_order?: number
+          field_of_study?: string
+          gpa?: string | null
+          id?: string
+          institution?: string
+          location?: string | null
+          period?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
       experiences: {
         Row: {
           company: string
           created_at: string
           description: string
+          display_order: number
           id: string
           location: string | null
           period: string
@@ -30,6 +73,7 @@ export type Database = {
           company: string
           created_at?: string
           description: string
+          display_order?: number
           id?: string
           location?: string | null
           period: string
@@ -41,6 +85,7 @@ export type Database = {
           company?: string
           created_at?: string
           description?: string
+          display_order?: number
           id?: string
           location?: string | null
           period?: string
@@ -55,6 +100,7 @@ export type Database = {
           created_at: string
           demo: string | null
           description: string
+          display_order: number
           github: string | null
           id: string
           image: string | null
@@ -66,6 +112,7 @@ export type Database = {
           created_at?: string
           demo?: string | null
           description: string
+          display_order?: number
           github?: string | null
           id?: string
           image?: string | null
@@ -77,6 +124,7 @@ export type Database = {
           created_at?: string
           demo?: string | null
           description?: string
+          display_order?: number
           github?: string | null
           id?: string
           image?: string | null

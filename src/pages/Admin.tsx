@@ -9,6 +9,7 @@ import { toast } from "@/hooks/use-toast";
 import { User } from "@supabase/supabase-js";
 import ProjectsManager from "@/components/admin/ProjectsManager";
 import ExperiencesManager from "@/components/admin/ExperiencesManager";
+import EducationManager from "@/components/admin/EducationManager";
 
 const Admin = () => {
   const [user, setUser] = useState<User | null>(null);
@@ -88,9 +89,10 @@ const Admin = () => {
 
       <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
         <Tabs defaultValue="projects" className="space-y-6">
-          <TabsList className="grid w-full grid-cols-2">
+          <TabsList className="grid w-full grid-cols-3">
             <TabsTrigger value="projects">Projetos</TabsTrigger>
             <TabsTrigger value="experiences">Experiências</TabsTrigger>
+            <TabsTrigger value="education">Formação</TabsTrigger>
           </TabsList>
           
           <TabsContent value="projects">
@@ -99,6 +101,10 @@ const Admin = () => {
           
           <TabsContent value="experiences">
             <ExperiencesManager />
+          </TabsContent>
+          
+          <TabsContent value="education">
+            <EducationManager />
           </TabsContent>
         </Tabs>
       </main>

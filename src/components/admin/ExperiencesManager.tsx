@@ -7,7 +7,7 @@ import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { Badge } from "@/components/ui/badge";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
-import { Plus, Edit, Trash2 } from "lucide-react";
+import { Plus, Edit, Trash2, ArrowUp, ArrowDown } from "lucide-react";
 import { toast } from "@/hooks/use-toast";
 
 interface Experience {
@@ -18,6 +18,7 @@ interface Experience {
   period: string;
   location?: string;
   technologies: string[];
+  display_order: number;
   created_at: string;
   updated_at: string;
 }
@@ -35,7 +36,8 @@ const ExperiencesManager = () => {
     description: "",
     period: "",
     location: "",
-    technologies: ""
+    technologies: "",
+    display_order: 0
   });
 
   useEffect(() => {
@@ -47,7 +49,7 @@ const ExperiencesManager = () => {
       const { data, error } = await supabase
         .from("experiences")
         .select("*")
-        .order("created_at", { ascending: false });
+        .order("display_order", { ascending: true });
 
       if (error) throw error;
       setExperiences(data || []);
@@ -73,6 +75,7 @@ const ExperiencesManager = () => {
         period: formData.period,
         location: formData.location || null,
         technologies: formData.technologies ? formData.technologies.split(",").map(t => t.trim()) : [],
+        display_order: Number(formData.display_order),
       };
 
       if (editingExperience) {
@@ -120,9 +123,62 @@ const ExperiencesManager = () => {
       description: experience.description,
       period: experience.period,
       location: experience.location || "",
-      technologies: experience.technologies.join(", ")
+      technologies: experience.technologies.join(", "),
+      display_order: experience.display_order
     });
     setIsDialogOpen(true);
+  };
+
+  const handleMoveUp = async (experience: Experience) => {
+    const currentIndex = experiences.findIndex(e => e.id === experience.id);
+    if (currentIndex <= 0) return;
+
+    const previousExperience = experiences[currentIndex - 1];
+    
+    try {
+      await Promise.all([
+        supabase.from('experiences').update({ display_order: previousExperience.display_order }).eq('id', experience.id),
+        supabase.from('experiences').update({ display_order: experience.display_order }).eq('id', previousExperience.id)
+      ]);
+      
+      await fetchExperiences();
+      toast({
+        title: "Sucesso",
+        description: "Ordem alterada com sucesso!",
+      });
+    } catch (error: any) {
+      toast({
+        title: "Erro ao alterar ordem",
+        description: error.message,
+        variant: "destructive",
+      });
+    }
+  };
+
+  const handleMoveDown = async (experience: Experience) => {
+    const currentIndex = experiences.findIndex(e => e.id === experience.id);
+    if (currentIndex >= experiences.length - 1) return;
+
+    const nextExperience = experiences[currentIndex + 1];
+    
+    try {
+      await Promise.all([
+        supabase.from('experiences').update({ display_order: nextExperience.display_order }).eq('id', experience.id),
+        supabase.from('experiences').update({ display_order: experience.display_order }).eq('id', nextExperience.id)
+      ]);
+      
+      await fetchExperiences();
+      toast({
+        title: "Sucesso",
+        description: "Ordem alterada com sucesso!",
+      });
+    } catch (error: any) {
+      toast({
+        title: "Erro ao alterar ordem",
+        description: error.message,
+        variant: "destructive",
+      });
+    }
   };
 
   const handleDelete = async (id: string) => {
@@ -158,7 +214,8 @@ const ExperiencesManager = () => {
       description: "",
       period: "",
       location: "",
-      technologies: ""
+      technologies: "",
+      display_order: experiences.length
     });
     setEditingExperience(null);
   };
@@ -245,6 +302,16 @@ const ExperiencesManager = () => {
                   placeholder="Python, React, PostgreSQL"
                 />
               </div>
+              <div className="space-y-2">
+                <Label htmlFor="display_order">Ordem de Exibição</Label>
+                <Input
+                  id="display_order"
+                  type="number"
+                  value={formData.display_order}
+                  onChange={(e) => setFormData({...formData, display_order: Number(e.target.value)})}
+                  min="0"
+                />
+              </div>
               <div className="flex justify-end space-x-2">
                 <Button 
                   type="button" 
@@ -275,6 +342,22 @@ const ExperiencesManager = () => {
                   </p>
                 </div>
                 <div className="flex space-x-1">
+                  <Button 
+                    variant="ghost" 
+                    size="sm"
+                    onClick={() => handleMoveUp(experience)}
+                    disabled={experiences.findIndex(e => e.id === experience.id) === 0}
+                  >
+                    <ArrowUp className="w-4 h-4" />
+                  </Button>
+                  <Button 
+                    variant="ghost" 
+                    size="sm"
+                    onClick={() => handleMoveDown(experience)}
+                    disabled={experiences.findIndex(e => e.id === experience.id) === experiences.length - 1}
+                  >
+                    <ArrowDown className="w-4 h-4" />
+                  </Button>
                   <Button 
                     variant="ghost" 
                     size="sm"
