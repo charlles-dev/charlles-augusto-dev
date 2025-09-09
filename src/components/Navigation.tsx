@@ -1,13 +1,20 @@
 import { useState, useEffect } from "react";
 import { Menu, X, Home, User, Briefcase, BookOpen, Mail } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import { FloatingNav } from "@/components/ui/floating-nav";
 import { motion, AnimatePresence } from "framer-motion";
 import { ThemeToggle } from "@/components/theme-toggle";
 
 const Navigation = () => {
   const [isOpen, setIsOpen] = useState(false);
   const [activeSection, setActiveSection] = useState("home");
+
+  const navItems = [
+    { id: "home", label: "Home", name: "Home", link: "home", icon: <Home className="h-4 w-4" /> },
+    { id: "about", label: "Sobre", name: "Sobre", link: "about", icon: <User className="h-4 w-4" /> },
+    { id: "projects", label: "Projetos", name: "Projetos", link: "projects", icon: <Briefcase className="h-4 w-4" /> },
+    { id: "experience", label: "Experiência", name: "Experiência", link: "experience", icon: <BookOpen className="h-4 w-4" /> },
+    { id: "contact", label: "Contato", name: "Contato", link: "contact", icon: <Mail className="h-4 w-4" /> },
+  ];
 
   useEffect(() => {
     const handleScroll = () => {
@@ -29,7 +36,7 @@ const Navigation = () => {
     handleScroll();
 
     return () => window.removeEventListener("scroll", handleScroll);
-  }, []);
+  }, [navItems]);
 
   const scrollToSection = (sectionId: string) => {
     const element = document.getElementById(sectionId);
@@ -39,19 +46,8 @@ const Navigation = () => {
     }
   };
 
-  const navItems = [
-    { id: "home", label: "Home", name: "Home", link: "home", icon: <Home className="h-4 w-4" /> },
-    { id: "about", label: "Sobre", name: "Sobre", link: "about", icon: <User className="h-4 w-4" /> },
-    { id: "projects", label: "Projetos", name: "Projetos", link: "projects", icon: <Briefcase className="h-4 w-4" /> },
-    { id: "experience", label: "Experiência", name: "Experiência", link: "experience", icon: <BookOpen className="h-4 w-4" /> },
-    { id: "contact", label: "Contato", name: "Contato", link: "contact", icon: <Mail className="h-4 w-4" /> },
-  ];
-
   return (
     <>
-      {/* Floating Navigation */}
-      <FloatingNav navItems={navItems} />
-      
       {/* Main Navigation */}
       <motion.nav 
         className="fixed top-0 w-full z-40 bg-background/80 backdrop-blur-md border-b border-border/50"
