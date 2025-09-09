@@ -5,7 +5,7 @@ import { Badge } from "@/components/ui/badge";
 import { Calendar, MapPin, GraduationCap } from "lucide-react";
 import { motion } from "framer-motion";
 
-interface Education {
+interface EducationItem {
   id: string;
   institution: string;
   degree: string;
@@ -18,7 +18,7 @@ interface Education {
 }
 
 const Education = () => {
-  const [educations, setEducations] = useState<Education[]>([]);
+  const [educations, setEducations] = useState<EducationItem[]>([]);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
