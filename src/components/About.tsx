@@ -40,7 +40,7 @@ const About = () => {
             className="space-y-6"
             initial={{ opacity: 0, x: -50 }}
             whileInView={{ opacity: 1, x: 0 }}
-            transition={{ duration: 0.6, delay: 0.2 }}
+            transition={{ type: "spring", stiffness: 100, damping: 20, delay: 0.2 }}
             viewport={{ once: true }}
           >
             <div>
@@ -106,7 +106,7 @@ const About = () => {
           <motion.div
             initial={{ opacity: 0, x: 50 }}
             whileInView={{ opacity: 1, x: 0 }}
-            transition={{ duration: 0.6, delay: 0.2 }}
+            transition={{ type: "spring", stiffness: 100, damping: 20, delay: 0.2 }}
             viewport={{ once: true }}
           >
             <motion.h3 

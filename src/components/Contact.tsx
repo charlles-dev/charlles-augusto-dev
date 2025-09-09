@@ -6,6 +6,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { useToast } from "@/hooks/use-toast";
+import { motion } from "framer-motion";
 
 const Contact = () => {
   const [formData, setFormData] = useState({
@@ -73,7 +74,13 @@ const Contact = () => {
 
         <div className="grid lg:grid-cols-2 gap-12">
           {/* Contact Info */}
-          <div className="space-y-8 animate-fade-in">
+          <motion.div 
+            className="space-y-8"
+            initial={{ opacity: 0, x: -30 }}
+            whileInView={{ opacity: 1, x: 0 }}
+            transition={{ duration: 0.7, ease: "easeOut" }}
+            viewport={{ once: true }}
+          >
             <Card className="bg-gradient-card border-border/50 hover:shadow-tech transition-all duration-300">
               <CardHeader>
                 <CardTitle className="flex items-center text-primary">
@@ -126,10 +133,15 @@ const Contact = () => {
                 </div>
               </CardContent>
             </Card>
-          </div>
+          </motion.div>
 
           {/* Contact Form */}
-          <div className="animate-slide-in-right">
+          <motion.div
+            initial={{ opacity: 0, x: 30 }}
+            whileInView={{ opacity: 1, x: 0 }}
+            transition={{ duration: 0.7, ease: "easeOut" }}
+            viewport={{ once: true }}
+          >
             <Card className="bg-gradient-card border-border/50 hover:shadow-tech transition-all duration-300">
               <CardHeader>
                 <CardTitle className="text-primary">Envie uma Mensagem</CardTitle>
@@ -198,7 +210,7 @@ const Contact = () => {
                 </form>
               </CardContent>
             </Card>
-          </div>
+          </motion.div>
         </div>
       </div>
     </section>

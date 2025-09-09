@@ -131,7 +131,8 @@ const Experience = () => {
                   duration: 0.6, 
                   delay: index * 0.2,
                   type: "spring",
-                  stiffness: 100
+                  stiffness: 100,
+                  damping: 15
                 }}
                 viewport={{ once: true }}
                 onMouseEnter={() => setActiveIndex(index)}

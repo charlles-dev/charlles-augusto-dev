@@ -113,11 +113,11 @@ const Education = () => {
           {educations.map((education, index) => (
             <motion.div
               key={education.id}
-              initial={{ opacity: 0, y: reducedMotion ? 0 : 30 }}
-              whileInView={{ opacity: 1, y: 0 }}
+              initial={{ opacity: 0, y: reducedMotion ? 0 : 30, scale: 0.95 }}
+              whileInView={{ opacity: 1, y: 0, scale: 1 }}
               viewport={{ once: true, margin: "-100px" }}
-              transition={{ duration: reducedMotion ? 0.1 : 0.6, delay: reducedMotion ? 0 : index * 0.1 }}
-              whileHover={reducedMotion ? {} : { y: -4 }}
+              transition={{ type: "spring", stiffness: 100, damping: 20, delay: reducedMotion ? 0 : index * 0.1 }}
+              whileHover={reducedMotion ? {} : { y: -8 }}
               className="group"
             >
               <Card className="h-full overflow-hidden border-border/20 bg-gradient-to-br from-card to-card/50 backdrop-blur-sm hover:border-primary/30 transition-all duration-500 hover:shadow-2xl hover:shadow-primary/10">

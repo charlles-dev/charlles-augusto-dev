@@ -106,10 +106,10 @@ const Projects = () => {
           {projects.map((project, index) => (
             <motion.div
               key={project.id}
-              initial={{ opacity: 0, y: reducedMotion ? 0 : 50 }}
-              whileInView={{ opacity: 1, y: 0 }}
+              initial={{ opacity: 0, y: reducedMotion ? 0 : 50, scale: 0.9 }}
+              whileInView={{ opacity: 1, y: 0, scale: 1 }}
               viewport={{ once: true, margin: "-100px" }}
-              transition={{ duration: reducedMotion ? 0.1 : 0.6, delay: reducedMotion ? 0 : index * 0.1 }}
+              transition={{ type: "spring", stiffness: 100, damping: 20, delay: reducedMotion ? 0 : index * 0.1 }}
               whileHover={reducedMotion ? {} : { y: -8 }}
               className="group"
             >
