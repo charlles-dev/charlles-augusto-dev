@@ -64,13 +64,12 @@ const Navigation = () => {
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex justify-between items-center h-16">
             <motion.div 
-              className="flex-shrink-0"
+              className="flex-shrink-0 cursor-pointer"
               whileHover={{ scale: 1.05 }}
               transition={{ type: "spring", stiffness: 300 }}
+              onClick={() => scrollToSection('home')}
             >
-              <span className="text-xl font-bold bg-gradient-primary bg-clip-text text-transparent cursor-pointer">
-                Charlles Augusto
-              </span>
+              <img src="/logo.png" alt="Charlles Augusto Logo" className="h-8 w-auto" />
             </motion.div>
 
             {/* Desktop Menu */}

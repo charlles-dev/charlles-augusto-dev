@@ -26,9 +26,7 @@ const Footer = () => {
       <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
         <div className="flex flex-col md:flex-row justify-between items-center">
           <div className="text-center md:text-left mb-6 md:mb-0">
-            <h3 className="text-xl font-bold bg-gradient-primary bg-clip-text text-transparent mb-2">
-              Charlles Augusto
-            </h3>
+            <img src="/logo.png" alt="Charlles Augusto Logo" className="h-8 w-auto mb-2 mx-auto md:mx-0" />
             <p className="text-muted-foreground">
               Cybersecurity &amp; Full-Stack Developer
             </p>
