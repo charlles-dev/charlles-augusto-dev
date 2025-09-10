@@ -1,12 +1,13 @@
-import { useState, useEffect, useMemo } from "react";
+import { useState, useMemo } from "react";
 import { Menu, X, Home, User, Briefcase, BookOpen, Mail } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { motion, AnimatePresence } from "framer-motion";
 import { ThemeToggle } from "@/components/theme-toggle";
+import { ScrollProgress } from "@/components/ui/scroll-progress";
+import { useScrollSpy } from "@/hooks/use-scroll-spy";
 
 const Navigation = () => {
   const [isOpen, setIsOpen] = useState(false);
-  const [activeSection, setActiveSection] = useState("home");
 
   const navItems = useMemo(() => [
     { id: "home", label: "Home", name: "Home", link: "home", icon: <Home className="h-4 w-4" /> },
@@ -16,40 +17,21 @@ const Navigation = () => {
     { id: "contact", label: "Contato", name: "Contato", link: "contact", icon: <Mail className="h-4 w-4" /> },
   ], []);
 
-  useEffect(() => {
-    const handleScroll = () => {
-      const sections = navItems.map(item => document.getElementById(item.id));
-      const scrollPosition = window.scrollY + 100;
+  const sectionIds = navItems.map(item => item.id);
+  const { activeSection, scrollProgress, scrollToSection } = useScrollSpy(sectionIds);
 
-      for (const section of sections) {
-        if (section) {
-          const { offsetTop, offsetHeight } = section;
-          if (scrollPosition >= offsetTop && scrollPosition < offsetTop + offsetHeight) {
-            setActiveSection(section.id);
-            break;
-          }
-        }
-      }
-    };
-
-    window.addEventListener("scroll", handleScroll);
-    handleScroll();
-
-    return () => window.removeEventListener("scroll", handleScroll);
-  }, [navItems]);
-
-  const scrollToSection = (sectionId: string) => {
-    const element = document.getElementById(sectionId);
-    if (element) {
-      element.scrollIntoView({ behavior: "smooth" });
-      setIsOpen(false);
-    }
+  const handleScrollToSection = (sectionId: string) => {
+    scrollToSection(sectionId);
+    setIsOpen(false);
   };
 
   return (
     <>
+      {/* Scroll Progress Indicator */}
+      <ScrollProgress progress={scrollProgress} />
+      
       {/* Main Navigation */}
-      <motion.nav 
+      <motion.nav
         className="fixed top-0 w-full z-40 bg-background/80 backdrop-blur-md border-b border-border/50"
         initial={{ y: -100 }}
         animate={{ y: 0 }}
@@ -63,7 +45,7 @@ const Navigation = () => {
               className="flex-shrink-0 cursor-pointer"
               whileHover={{ scale: 1.05 }}
               transition={{ type: "spring", stiffness: 300 }}
-              onClick={() => scrollToSection('home')}
+              onClick={() => handleScrollToSection('home')}
             >
               <img src="/logo.png" alt="Charlles Augusto Logo" className="h-8 w-auto" />
             </motion.div>
@@ -74,7 +56,7 @@ const Navigation = () => {
                 {navItems.map((item, index) => (
                   <motion.button
               key={item.id}
-              onClick={() => scrollToSection(item.id)}
+              onClick={() => handleScrollToSection(item.id)}
               className={`text-foreground hover:text-primary transition-colors duration-300 font-medium relative group ${
                 activeSection === item.id ? "text-primary" : ""
               }`}
@@ -150,7 +132,7 @@ const Navigation = () => {
                   {navItems.map((item, index) => (
                     <motion.button
                     key={item.id}
-                    onClick={() => scrollToSection(item.id)}
+                    onClick={() => handleScrollToSection(item.id)}
                     className="flex items-center w-full text-left px-3 py-2 text-foreground hover:text-primary transition-colors duration-300 rounded-md hover:bg-primary/10"
                     initial={{ opacity: 0, x: -20 }}
                     animate={{ opacity: 1, x: 0 }}
