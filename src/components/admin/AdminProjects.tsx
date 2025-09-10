@@ -26,7 +26,14 @@ export const AdminProjects: React.FC = () => {
   const { handleReorder } = useSortableData({
     tableName: 'projects',
     queryKey: ['projects'],
-    onUpdate: setProjects,
+    onUpdate: (items) => {
+      // Convert SortableItem[] to Project[]
+      const updatedProjects = items.map(item => {
+        const project = projects.find(p => p.id === item.id);
+        return project || null;
+      }).filter(Boolean) as Project[];
+      setProjects(updatedProjects);
+    },
   });
 
   const fetchProjects = React.useCallback(async () => {
@@ -38,7 +45,13 @@ export const AdminProjects: React.FC = () => {
         .order('display_order', { ascending: true });
 
       if (error) throw error;
-      setProjects(data || []);
+      // Ensure all required Project properties are present
+      const projectsWithDefaults = data.map(project => ({
+        ...project,
+        is_featured: project.is_featured || false,
+        status: project.status || 'published',
+      }));
+      setProjects(projectsWithDefaults);
     } catch (error) {
       console.error('Error fetching projects:', error);
       toast.error(t('common.error'));
@@ -160,7 +173,6 @@ export const AdminProjects: React.FC = () => {
               fetchProjects();
               setIsFormOpen(false);
             }}
-            onCancel={() => setIsFormOpen(false)}
           />
         </DialogContent>
       </Dialog>

@@ -33,20 +33,25 @@ const projectSchema = z.object({
   display_order: z.number().min(0),
 });
 
-const educationSchema = baseSchema.extend({
+const educationSchema = z.object({
   institution: z.string().min(1, 'Instituição é obrigatória'),
   degree: z.string().min(1, 'Grau é obrigatório'),
-  start_date: z.string().min(1, 'Data de início é obrigatória'),
-  end_date: z.string().optional(),
-  is_current: z.boolean().default(false),
+  field_of_study: z.string().min(1, 'Área de estudo é obrigatória'),
+  period: z.string().min(1, 'Período é obrigatório'),
+  description: z.string().optional(),
+  location: z.string().optional(),
+  gpa: z.string().optional(),
+  display_order: z.number().min(0),
 });
 
-const experienceSchema = baseSchema.extend({
+const experienceSchema = z.object({
+  title: z.string().min(1, 'Cargo é obrigatório'),
   company: z.string().min(1, 'Empresa é obrigatória'),
-  position: z.string().min(1, 'Cargo é obrigatório'),
-  start_date: z.string().min(1, 'Data de início é obrigatória'),
-  end_date: z.string().optional(),
-  is_current: z.boolean().default(false),
+  description: z.string().min(1, 'Descrição é obrigatória'),
+  period: z.string().min(1, 'Período é obrigatório'),
+  location: z.string().optional(),
+  technologies: z.array(z.string()).optional(),
+  display_order: z.number().min(0),
 });
 
 type ItemType = 'projects' | 'education' | 'experiences';
@@ -67,6 +72,7 @@ interface ItemFormProps {
   type: ItemType;
   item?: Project | Education | Experience;
   onSuccess?: () => void;
+  onCancel?: () => void;
 }
 
 const getSchema = (type: ItemType) => {
@@ -96,26 +102,23 @@ const getDefaultValues = (type: ItemType, item?: Project | Education | Experienc
       };
     case 'education':
       return {
-        title: (item as Education)?.title || '',
-        description: item?.description || '',
         institution: (item as Education)?.institution || '',
         degree: (item as Education)?.degree || '',
-        start_date: (item as Education)?.start_date || '',
-        end_date: (item as Education)?.end_date || '',
-        is_current: (item as Education)?.is_current || false,
-        image_url: (item as Education)?.image_url || '',
+        field_of_study: (item as Education)?.field_of_study || '',
+        period: (item as Education)?.period || '',
+        description: item?.description || '',
+        location: (item as Education)?.location || '',
+        gpa: (item as Education)?.gpa || '',
         display_order: item?.display_order || 0,
       };
     case 'experiences':
       return {
         title: (item as Experience)?.title || '',
-        description: item?.description || '',
         company: (item as Experience)?.company || '',
-        position: (item as Experience)?.position || '',
-        start_date: (item as Experience)?.start_date || '',
-        end_date: (item as Experience)?.end_date || '',
-        is_current: (item as Experience)?.is_current || false,
-        image_url: (item as Experience)?.image_url || '',
+        description: (item as Experience)?.description || '',
+        period: (item as Experience)?.period || '',
+        location: (item as Experience)?.location || '',
+        technologies: (item as Experience)?.technologies || [],
         display_order: item?.display_order || 0,
       };
     default:
@@ -123,7 +126,7 @@ const getDefaultValues = (type: ItemType, item?: Project | Education | Experienc
   }
 };
 
-export const ItemForm: React.FC<ItemFormProps> = ({ type, item, onSuccess }) => {
+export const ItemForm: React.FC<ItemFormProps> = ({ type, item, onSuccess, onCancel }) => {
   const queryClient = useQueryClient();
   const schema = getSchema(type);
   const isEdit = !!item;
@@ -228,6 +231,19 @@ export const ItemForm: React.FC<ItemFormProps> = ({ type, item, onSuccess }) => 
                         </FormItem>
                       )}
                     />
+                    <FormField
+                      control={form.control}
+                      name="field_of_study"
+                      render={({ field }) => (
+                        <FormItem>
+                          <FormLabel>Área de Estudo</FormLabel>
+                          <FormControl>
+                            <Input placeholder="Ciência da Computação" {...field} />
+                          </FormControl>
+                          <FormMessage />
+                        </FormItem>
+                      )}
+                    />
                   </>
                 )}
 
@@ -248,7 +264,7 @@ export const ItemForm: React.FC<ItemFormProps> = ({ type, item, onSuccess }) => 
                     />
                     <FormField
                       control={form.control}
-                      name="position"
+                      name="title"
                       render={({ field }) => (
                         <FormItem>
                           <FormLabel>Cargo</FormLabel>
@@ -261,8 +277,6 @@ export const ItemForm: React.FC<ItemFormProps> = ({ type, item, onSuccess }) => 
                     />
                   </>
                 )}
-
-
 
                 <FormField
                   control={form.control}
@@ -334,52 +348,49 @@ export const ItemForm: React.FC<ItemFormProps> = ({ type, item, onSuccess }) => 
                 <CardContent className="space-y-4">
                   <FormField
                     control={form.control}
-                    name="start_date"
+                    name="period"
                     render={({ field }) => (
                       <FormItem>
-                        <FormLabel>Data de Início</FormLabel>
+                        <FormLabel>Período</FormLabel>
                         <FormControl>
-                          <Input type="month" {...field} />
+                          <Input placeholder="2020 - 2024" {...field} />
                         </FormControl>
                         <FormMessage />
                       </FormItem>
                     )}
                   />
 
-                  <FormField
-                    control={form.control}
-                    name="end_date"
-                    render={({ field }) => (
-                      <FormItem>
-                        <FormLabel>Data de Término</FormLabel>
-                        <FormControl>
-                          <Input type="month" {...field} />
-                        </FormControl>
-                        <FormMessage />
-                      </FormItem>
-                    )}
-                  />
+                  {type === 'education' && (
+                    <>
+                      <FormField
+                        control={form.control}
+                        name="location"
+                        render={({ field }) => (
+                          <FormItem>
+                            <FormLabel>Localização</FormLabel>
+                            <FormControl>
+                              <Input placeholder="São Paulo, SP" {...field} />
+                            </FormControl>
+                            <FormMessage />
+                          </FormItem>
+                        )}
+                      />
 
-                  <FormField
-                    control={form.control}
-                    name="is_current"
-                    render={({ field }) => (
-                      <FormItem className="flex items-center justify-between">
-                        <div>
-                          <FormLabel>Atual</FormLabel>
-                          <FormDescription>
-                            Ainda está em andamento
-                          </FormDescription>
-                        </div>
-                        <FormControl>
-                          <Switch
-                            checked={field.value}
-                            onCheckedChange={field.onChange}
-                          />
-                        </FormControl>
-                      </FormItem>
-                    )}
-                  />
+                      <FormField
+                        control={form.control}
+                        name="gpa"
+                        render={({ field }) => (
+                          <FormItem>
+                            <FormLabel>GPA/Nota</FormLabel>
+                            <FormControl>
+                              <Input placeholder="8.5/10" {...field} />
+                            </FormControl>
+                            <FormMessage />
+                          </FormItem>
+                        )}
+                      />
+                    </>
+                  )}
                 </CardContent>
               </Card>
             )}
@@ -424,6 +435,9 @@ export const ItemForm: React.FC<ItemFormProps> = ({ type, item, onSuccess }) => 
         </div>
 
         <div className="flex justify-end space-x-4">
+          <Button type="button" variant="outline" onClick={onCancel}>
+            Cancelar
+          </Button>
           <Button type="submit" disabled={mutation.isPending}>
             {mutation.isPending ? 'Salvando...' : isEdit ? 'Atualizar' : 'Criar'}
           </Button>
