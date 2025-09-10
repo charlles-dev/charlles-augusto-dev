@@ -33,10 +33,9 @@ const projectSchema = z.object({
   display_order: z.number().min(0),
 });
 
-const educationSchema = z.object({
+const educationSchema = baseSchema.extend({
   institution: z.string().min(1, 'Instituição é obrigatória'),
   degree: z.string().min(1, 'Grau é obrigatório'),
-  field_of_study: z.string().min(1, 'Área de estudo é obrigatória'),
   period: z.string().min(1, 'Período é obrigatório'),
   description: z.string().optional(),
   location: z.string().optional(),
@@ -44,11 +43,11 @@ const educationSchema = z.object({
   display_order: z.number().min(0),
 });
 
-const experienceSchema = z.object({
-  title: z.string().min(1, 'Cargo é obrigatório'),
+const experienceSchema = baseSchema.extend({
   company: z.string().min(1, 'Empresa é obrigatória'),
-  description: z.string().min(1, 'Descrição é obrigatória'),
+  title: z.string().min(1, 'Cargo é obrigatório'),
   period: z.string().min(1, 'Período é obrigatório'),
+  description: z.string().optional(),
   location: z.string().optional(),
   technologies: z.array(z.string()).optional(),
   display_order: z.number().min(0),
@@ -72,7 +71,6 @@ interface ItemFormProps {
   type: ItemType;
   item?: Project | Education | Experience;
   onSuccess?: () => void;
-  onCancel?: () => void;
 }
 
 const getSchema = (type: ItemType) => {
@@ -102,11 +100,11 @@ const getDefaultValues = (type: ItemType, item?: Project | Education | Experienc
       };
     case 'education':
       return {
+        title: (item as Education)?.degree || '',
+        description: item?.description || '',
         institution: (item as Education)?.institution || '',
         degree: (item as Education)?.degree || '',
-        field_of_study: (item as Education)?.field_of_study || '',
         period: (item as Education)?.period || '',
-        description: item?.description || '',
         location: (item as Education)?.location || '',
         gpa: (item as Education)?.gpa || '',
         display_order: item?.display_order || 0,
@@ -114,8 +112,8 @@ const getDefaultValues = (type: ItemType, item?: Project | Education | Experienc
     case 'experiences':
       return {
         title: (item as Experience)?.title || '',
+        description: item?.description || '',
         company: (item as Experience)?.company || '',
-        description: (item as Experience)?.description || '',
         period: (item as Experience)?.period || '',
         location: (item as Experience)?.location || '',
         technologies: (item as Experience)?.technologies || [],
@@ -126,7 +124,7 @@ const getDefaultValues = (type: ItemType, item?: Project | Education | Experienc
   }
 };
 
-export const ItemForm: React.FC<ItemFormProps> = ({ type, item, onSuccess, onCancel }) => {
+export const ItemForm: React.FC<ItemFormProps> = ({ type, item, onSuccess }) => {
   const queryClient = useQueryClient();
   const schema = getSchema(type);
   const isEdit = !!item;
@@ -231,19 +229,6 @@ export const ItemForm: React.FC<ItemFormProps> = ({ type, item, onSuccess, onCan
                         </FormItem>
                       )}
                     />
-                    <FormField
-                      control={form.control}
-                      name="field_of_study"
-                      render={({ field }) => (
-                        <FormItem>
-                          <FormLabel>Área de Estudo</FormLabel>
-                          <FormControl>
-                            <Input placeholder="Ciência da Computação" {...field} />
-                          </FormControl>
-                          <FormMessage />
-                        </FormItem>
-                      )}
-                    />
                   </>
                 )}
 
@@ -305,7 +290,7 @@ export const ItemForm: React.FC<ItemFormProps> = ({ type, item, onSuccess, onCan
               <CardContent>
                 <ImageUpload
                   onImageUploaded={handleImageUploaded}
-                  currentImage={form.watch(type === 'projects' ? 'image' : 'image_url')}
+                  currentImage={form.watch(type === 'projects' ? 'image' : 'image_url') as string}
                   bucket={type === 'projects' ? 'project-images' : 'avatars'}
                 />
               </CardContent>
@@ -353,7 +338,7 @@ export const ItemForm: React.FC<ItemFormProps> = ({ type, item, onSuccess, onCan
                       <FormItem>
                         <FormLabel>Período</FormLabel>
                         <FormControl>
-                          <Input placeholder="2020 - 2024" {...field} />
+                          <Input placeholder="2018 - 2022" {...field} />
                         </FormControl>
                         <FormMessage />
                       </FormItem>
@@ -384,6 +369,42 @@ export const ItemForm: React.FC<ItemFormProps> = ({ type, item, onSuccess, onCan
                             <FormLabel>GPA/Nota</FormLabel>
                             <FormControl>
                               <Input placeholder="8.5/10" {...field} />
+                            </FormControl>
+                            <FormMessage />
+                          </FormItem>
+                        )}
+                      />
+                    </>
+                  )}
+
+                  {type === 'experiences' && (
+                    <>
+                      <FormField
+                        control={form.control}
+                        name="location"
+                        render={({ field }) => (
+                          <FormItem>
+                            <FormLabel>Localização</FormLabel>
+                            <FormControl>
+                              <Input placeholder="São Paulo, SP" {...field} />
+                            </FormControl>
+                            <FormMessage />
+                          </FormItem>
+                        )}
+                      />
+
+                      <FormField
+                        control={form.control}
+                        name="technologies"
+                        render={({ field }) => (
+                          <FormItem>
+                            <FormLabel>Tecnologias (separadas por vírgula)</FormLabel>
+                            <FormControl>
+                              <Input 
+                                placeholder="React, Node.js, PostgreSQL" 
+                                {...field}
+                                onChange={e => field.onChange(e.target.value.split(',').map(t => t.trim()))}
+                              />
                             </FormControl>
                             <FormMessage />
                           </FormItem>
@@ -435,9 +456,6 @@ export const ItemForm: React.FC<ItemFormProps> = ({ type, item, onSuccess, onCan
         </div>
 
         <div className="flex justify-end space-x-4">
-          <Button type="button" variant="outline" onClick={onCancel}>
-            Cancelar
-          </Button>
           <Button type="submit" disabled={mutation.isPending}>
             {mutation.isPending ? 'Salvando...' : isEdit ? 'Atualizar' : 'Criar'}
           </Button>

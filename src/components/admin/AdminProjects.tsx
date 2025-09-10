@@ -48,8 +48,8 @@ export const AdminProjects: React.FC = () => {
       // Ensure all required Project properties are present
       const projectsWithDefaults = data.map(project => ({
         ...project,
-        is_featured: project.is_featured || false,
-        status: project.status || 'published',
+        is_featured: (project as any).is_featured || false,
+        status: (project as any).status || 'published',
       }));
       setProjects(projectsWithDefaults);
     } catch (error) {
@@ -133,8 +133,8 @@ export const AdminProjects: React.FC = () => {
             />
             <div className="flex-1">
               <ProjectCard
-                project={project}
-                onEdit={() => openEditForm(project)}
+                project={project as Project}
+                onEdit={() => openEditForm(project as Project)}
                 onDelete={() => handleAction(bulkDelete, [project.id])}
               />
             </div>
