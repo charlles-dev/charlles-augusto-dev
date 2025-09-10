@@ -24,8 +24,10 @@ export type Database = {
           gpa: string | null
           id: string
           institution: string
+          is_featured: boolean
           location: string | null
           period: string
+          status: string
           updated_at: string
         }
         Insert: {
@@ -37,8 +39,10 @@ export type Database = {
           gpa?: string | null
           id?: string
           institution: string
+          is_featured?: boolean
           location?: string | null
           period: string
+          status?: string
           updated_at?: string
         }
         Update: {
@@ -50,8 +54,10 @@ export type Database = {
           gpa?: string | null
           id?: string
           institution?: string
+          is_featured?: boolean
           location?: string | null
           period?: string
+          status?: string
           updated_at?: string
         }
         Relationships: []
@@ -63,8 +69,10 @@ export type Database = {
           description: string
           display_order: number
           id: string
+          is_featured: boolean
           location: string | null
           period: string
+          status: string
           technologies: string[] | null
           title: string
           updated_at: string
@@ -75,8 +83,10 @@ export type Database = {
           description: string
           display_order?: number
           id?: string
+          is_featured?: boolean
           location?: string | null
           period: string
+          status?: string
           technologies?: string[] | null
           title: string
           updated_at?: string
@@ -87,8 +97,10 @@ export type Database = {
           description?: string
           display_order?: number
           id?: string
+          is_featured?: boolean
           location?: string | null
           period?: string
+          status?: string
           technologies?: string[] | null
           title?: string
           updated_at?: string
@@ -104,7 +116,9 @@ export type Database = {
           github: string | null
           id: string
           image: string | null
+          is_featured: boolean
           name: string
+          status: string
           technologies: string[]
           updated_at: string
         }
@@ -116,7 +130,9 @@ export type Database = {
           github?: string | null
           id?: string
           image?: string | null
+          is_featured?: boolean
           name: string
+          status?: string
           technologies?: string[]
           updated_at?: string
         }
@@ -128,7 +144,9 @@ export type Database = {
           github?: string | null
           id?: string
           image?: string | null
+          is_featured?: boolean
           name?: string
+          status?: string
           technologies?: string[]
           updated_at?: string
         }
