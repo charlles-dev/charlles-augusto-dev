@@ -9,40 +9,43 @@ export interface Project {
   github: string | null;
   demo: string | null;
   display_order: number;
+  is_featured: boolean;
+  status: 'draft' | 'published';
 }
 
-export interface BaseItem {
+export interface Experience {
   id: string;
   created_at: string;
   updated_at: string;
-  display_order: number;
   title: string;
+  company: string;
   description: string;
-  image_url?: string;
+  period: string;
+  location: string | null;
+  technologies: string[] | null;
+  display_order: number;
+  is_featured: boolean;
+  status: 'draft' | 'published';
 }
 
-export interface Education extends BaseItem {
-  title: string;
-  description: string;
+export interface Education {
+  id: string;
+  created_at: string;
+  updated_at: string;
   institution: string;
   degree: string;
-  start_date: string;
-  end_date?: string;
-  is_current: boolean;
-  image_url?: string;
+  field_of_study: string;
+  period: string;
+  description: string | null;
+  location: string | null;
+  gpa: string | null;
+  display_order: number;
+  is_featured: boolean;
+  status: 'draft' | 'published';
 }
 
-export interface Experience extends BaseItem {
-  title: string;
-  description: string;
-  company: string;
-  position: string;
-  start_date: string;
-  end_date?: string;
-  is_current: boolean;
-  image_url?: string;
-}
 
+export type Item = Project | Experience | Education;
 export type ItemType = 'projects' | 'education' | 'experiences';
 
 export interface Database {

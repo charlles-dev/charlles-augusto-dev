@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useMemo } from "react";
 import { Menu, X, Home, User, Briefcase, BookOpen, Mail } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { motion, AnimatePresence } from "framer-motion";
@@ -8,13 +8,13 @@ const Navigation = () => {
   const [isOpen, setIsOpen] = useState(false);
   const [activeSection, setActiveSection] = useState("home");
 
-  const navItems = [
+  const navItems = useMemo(() => [
     { id: "home", label: "Home", name: "Home", link: "home", icon: <Home className="h-4 w-4" /> },
     { id: "about", label: "Sobre", name: "Sobre", link: "about", icon: <User className="h-4 w-4" /> },
     { id: "projects", label: "Projetos", name: "Projetos", link: "projects", icon: <Briefcase className="h-4 w-4" /> },
     { id: "experience", label: "Experiência", name: "Experiência", link: "experience", icon: <BookOpen className="h-4 w-4" /> },
     { id: "contact", label: "Contato", name: "Contato", link: "contact", icon: <Mail className="h-4 w-4" /> },
-  ];
+  ], []);
 
   useEffect(() => {
     const handleScroll = () => {

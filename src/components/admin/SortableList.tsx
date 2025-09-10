@@ -20,12 +20,10 @@ import {
 import { CSS } from '@dnd-kit/utilities';
 import { GripVertical } from 'lucide-react';
 import { Button } from '@/components/ui/button';
-import { Card, CardContent } from '@/components/ui/card';
 
 interface SortableItemProps {
   id: string;
   children: React.ReactNode;
-  isDragging?: boolean;
 }
 
 function SortableItem({ id, children }: SortableItemProps) {
@@ -45,22 +43,18 @@ function SortableItem({ id, children }: SortableItemProps) {
   };
 
   return (
-    <div ref={setNodeRef} style={style} className="mb-2">
-      <Card className={isDragging ? "shadow-lg" : ""}>
-        <CardContent className="p-4 flex items-center gap-4">
-          <Button
-            variant="ghost"
-            size="icon"
-            className="cursor-grab active:cursor-grabbing"
-            {...attributes}
-            {...listeners}
-            aria-label="Drag to reorder"
-          >
-            <GripVertical className="h-4 w-4" />
-          </Button>
-          {children}
-        </CardContent>
-      </Card>
+    <div ref={setNodeRef} style={style} className="mb-2 flex items-center gap-2">
+      <Button
+        variant="ghost"
+        size="icon"
+        className="cursor-grab active:cursor-grabbing touch-none"
+        {...attributes}
+        {...listeners}
+        aria-label="Arraste para reordenar"
+      >
+        <GripVertical className="h-5 w-5 text-muted-foreground" />
+      </Button>
+      <div className="flex-grow">{children}</div>
     </div>
   );
 }
@@ -69,14 +63,12 @@ interface SortableListProps<T extends { id: string }> {
   items: T[];
   onReorder: (items: T[]) => void;
   renderItem: (item: T, index: number) => React.ReactNode;
-  itemKey?: string;
 }
 
 export function SortableList<T extends { id: string }>({
   items,
   onReorder,
   renderItem,
-  itemKey = 'id',
 }: SortableListProps<T>) {
   const sensors = useSensors(
     useSensor(PointerSensor),
@@ -88,9 +80,9 @@ export function SortableList<T extends { id: string }>({
   const handleDragEnd = (event: DragEndEvent) => {
     const { active, over } = event;
 
-    if (active.id !== over?.id) {
-      const oldIndex = items.findIndex((item) => item[itemKey] === active.id);
-      const newIndex = items.findIndex((item) => item[itemKey] === over?.id);
+    if (over && active.id !== over.id) {
+      const oldIndex = items.findIndex((item) => item.id === active.id);
+      const newIndex = items.findIndex((item) => item.id === over.id);
 
       const newItems = arrayMove(items, oldIndex, newIndex);
       onReorder(newItems);
@@ -103,12 +95,14 @@ export function SortableList<T extends { id: string }>({
       collisionDetection={closestCenter}
       onDragEnd={handleDragEnd}
     >
-      <SortableContext items={items.map(item => item[itemKey])} strategy={verticalListSortingStrategy}>
-        {items.map((item, index) => (
-          <SortableItem key={item[itemKey]} id={item[itemKey]}>
-            {renderItem(item, index)}
-          </SortableItem>
-        ))}
+      <SortableContext items={items.map(item => item.id)} strategy={verticalListSortingStrategy}>
+        <div className="space-y-2">
+          {items.map((item, index) => (
+            <SortableItem key={item.id} id={item.id}>
+              {renderItem(item, index)}
+            </SortableItem>
+          ))}
+        </div>
       </SortableContext>
     </DndContext>
   );

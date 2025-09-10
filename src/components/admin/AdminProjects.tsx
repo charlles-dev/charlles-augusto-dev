@@ -9,6 +9,10 @@ import { useAdminActions } from '@/hooks/useAdminActions';
 import { Button } from '@/components/ui/button';
 import { Checkbox } from '@/components/ui/checkbox';
 import { toast } from 'sonner';
+import { SortableList } from '@/components/admin/SortableList';
+import { useSortableData } from '@/hooks/use-sortable-data';
+import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
+import { Plus } from 'lucide-react';
 
 export const AdminProjects: React.FC = () => {
   const { t } = useTranslation();
@@ -16,11 +20,17 @@ export const AdminProjects: React.FC = () => {
   const [loading, setLoading] = useState(true);
   const [selectedProjects, setSelectedProjects] = useState<string[]>([]);
   const [editingProject, setEditingProject] = useState<Project | null>(null);
-  const [showForm, setShowForm] = useState(false);
+  const [isFormOpen, setIsFormOpen] = useState(false);
 
   const { duplicateItem, bulkUpdate, bulkDelete } = useAdminActions('projects');
+  const { handleReorder } = useSortableData({
+    tableName: 'projects',
+    queryKey: ['projects'],
+    onUpdate: setProjects,
+  });
 
   const fetchProjects = React.useCallback(async () => {
+    setLoading(true);
     try {
       const { data, error } = await supabase
         .from('projects')
@@ -41,11 +51,11 @@ export const AdminProjects: React.FC = () => {
     fetchProjects();
   }, [fetchProjects]);
 
-  const handleSelectAll = () => {
-    if (selectedProjects.length === projects.length) {
-      setSelectedProjects([]);
-    } else {
+  const handleSelectAll = (checked: boolean | 'indeterminate') => {
+    if (checked === true) {
       setSelectedProjects(projects.map(p => p.id));
+    } else {
+      setSelectedProjects([]);
     }
   };
 
@@ -57,44 +67,20 @@ export const AdminProjects: React.FC = () => {
     );
   };
 
-  const handleDuplicate = async (ids: string[]) => {
-    for (const id of ids) {
-      await duplicateItem(id);
-    }
+  const handleAction = async (action: Function, ids: string[]) => {
+    await action(ids);
     await fetchProjects();
     setSelectedProjects([]);
   };
 
-  const handlePublish = async (ids: string[]) => {
-    await bulkUpdate(ids, { status: 'published' });
-    await fetchProjects();
-    setSelectedProjects([]);
+  const openNewForm = () => {
+    setEditingProject(null);
+    setIsFormOpen(true);
   };
 
-  const handleUnpublish = async (ids: string[]) => {
-    await bulkUpdate(ids, { status: 'draft' });
-    await fetchProjects();
-    setSelectedProjects([]);
-  };
-
-  const handleMarkFeatured = async (ids: string[]) => {
-    await bulkUpdate(ids, { is_featured: true });
-    await fetchProjects();
-    setSelectedProjects([]);
-  };
-
-  const handleRemoveFeatured = async (ids: string[]) => {
-    await bulkUpdate(ids, { is_featured: false });
-    await fetchProjects();
-    setSelectedProjects([]);
-  };
-
-  const handleDelete = async (ids: string[]) => {
-    if (window.confirm(t('admin.confirmDelete'))) {
-      await bulkDelete(ids);
-      await fetchProjects();
-      setSelectedProjects([]);
-    }
+  const openEditForm = (project: Project) => {
+    setEditingProject(project);
+    setIsFormOpen(true);
   };
 
   if (loading) {
@@ -102,29 +88,32 @@ export const AdminProjects: React.FC = () => {
   }
 
   return (
-    <div className="p-8">
-      <div className="flex justify-between items-center mb-6">
-        <h1 className="text-2xl font-bold">{t('admin.manageProjects')}</h1>
-        <Button onClick={() => setShowForm(true)}>
-          {t('admin.addNew')}
+    <div className="space-y-6">
+      <div className="flex justify-between items-center">
+        <h2 className="text-3xl font-bold">Gerenciar Projetos</h2>
+        <Button onClick={openNewForm}>
+          <Plus className="w-4 h-4 mr-2" />
+          Novo Projeto
         </Button>
       </div>
 
       {projects.length > 0 && (
-        <div className="mb-4 flex items-center gap-4">
+        <div className="flex items-center gap-4 p-2 rounded-md bg-muted/50">
           <Checkbox
-            checked={selectedProjects.length === projects.length}
+            checked={selectedProjects.length > 0 && selectedProjects.length === projects.length}
             onCheckedChange={handleSelectAll}
           />
-          <span className="text-sm">
-            {selectedProjects.length} {t('admin.selected')}
+          <span className="text-sm text-muted-foreground">
+            {selectedProjects.length} de {projects.length} selecionado(s)
           </span>
         </div>
       )}
 
-      <div className="grid gap-4">
-        {projects.map((project) => (
-          <div key={project.id} className="flex items-center gap-4">
+      <SortableList
+        items={projects}
+        onReorder={handleReorder}
+        renderItem={(project) => (
+          <div className="flex items-center gap-4 w-full">
             <Checkbox
               checked={selectedProjects.includes(project.id)}
               onCheckedChange={() => handleSelectProject(project.id)}
@@ -132,44 +121,49 @@ export const AdminProjects: React.FC = () => {
             <div className="flex-1">
               <ProjectCard
                 project={project}
-                onEdit={() => {
-                  setEditingProject(project);
-                  setShowForm(true);
-                }}
-                onDelete={() => handleDelete([project.id])}
+                onEdit={() => openEditForm(project)}
+                onDelete={() => handleAction(bulkDelete, [project.id])}
               />
             </div>
           </div>
-        ))}
-      </div>
+        )}
+      />
 
       {projects.length === 0 && (
-        <div className="text-center py-8 text-muted-foreground">
-          {t('projects.empty')}
+        <div className="text-center py-16 border-2 border-dashed rounded-lg">
+          <h3 className="text-lg font-medium">{t('projects.empty')}</h3>
+          <p className="text-sm text-muted-foreground mt-1">Comece adicionando um novo projeto.</p>
         </div>
       )}
 
       <BulkActionsBar
         selectedItems={selectedProjects}
-        onDuplicate={handleDuplicate}
-        onPublish={handlePublish}
-        onUnpublish={handleUnpublish}
-        onMarkFeatured={handleMarkFeatured}
-        onRemoveFeatured={handleRemoveFeatured}
-        onDelete={handleDelete}
+        onDuplicate={(ids) => handleAction(duplicateItem, ids)}
+        onPublish={(ids) => handleAction((ids) => bulkUpdate(ids, { status: 'published' }), ids)}
+        onUnpublish={(ids) => handleAction((ids) => bulkUpdate(ids, { status: 'draft' }), ids)}
+        onMarkFeatured={(ids) => handleAction((ids) => bulkUpdate(ids, { is_featured: true }), ids)}
+        onRemoveFeatured={(ids) => handleAction((ids) => bulkUpdate(ids, { is_featured: false }), ids)}
+        onDelete={(ids) => handleAction(bulkDelete, ids)}
       />
 
-      {showForm && (
-        <ItemForm
-          type="projects"
-          item={editingProject}
-          onSuccess={() => {
-            fetchProjects();
-            setShowForm(false);
-            setEditingProject(null);
-          }}
-        />
-      )}
+      <Dialog open={isFormOpen} onOpenChange={setIsFormOpen}>
+        <DialogContent className="max-w-3xl">
+          <DialogHeader>
+            <DialogTitle>
+              {editingProject ? "Editar Projeto" : "Novo Projeto"}
+            </DialogTitle>
+          </DialogHeader>
+          <ItemForm
+            type="projects"
+            item={editingProject}
+            onSuccess={() => {
+              fetchProjects();
+              setIsFormOpen(false);
+            }}
+            onCancel={() => setIsFormOpen(false)}
+          />
+        </DialogContent>
+      </Dialog>
     </div>
   );
 };

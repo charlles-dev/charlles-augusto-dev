@@ -76,10 +76,10 @@ const Auth = () => {
           description: "Verifique seu email para confirmar a conta.",
         });
       }
-    } catch (error: any) {
+    } catch (error: Error | unknown) {
       toast({
         title: "Erro na autenticação",
-        description: error.message,
+        description: error instanceof Error ? error.message : "An unexpected error occurred",
         variant: "destructive",
       });
     } finally {
