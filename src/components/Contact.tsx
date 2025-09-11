@@ -1,216 +1,95 @@
-import { useState } from "react";
-import { Mail, Github, Linkedin, Send, MapPin } from "lucide-react";
-import { Button } from "@/components/ui/button";
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
-import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
-import { Textarea } from "@/components/ui/textarea";
-import { useToast } from "@/hooks/use-toast";
-import { motion } from "framer-motion";
+import React from 'react';
+import { Card, CardContent } from "@/components/ui/card";
+import { Mail, Phone, MapPin } from "lucide-react";
+import { ContactForm } from '@/components/advanced/ContactForm';
+import { NewsletterSignup } from '@/components/advanced/NewsletterSignup';
+import { RevealSection } from '@/components/ui/reveal-section';
 
 const Contact = () => {
-  const [formData, setFormData] = useState({
-    name: "",
-    email: "",
-    message: ""
-  });
-  const [isSubmitting, setIsSubmitting] = useState(false);
-  const { toast } = useToast();
-
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
-    setIsSubmitting(true);
-    
-    // Simulate form submission
-    setTimeout(() => {
-      toast({
-        title: "Mensagem enviada!",
-        description: "Obrigado pelo contato. Retornarei em breve!",
-      });
-      setFormData({ name: "", email: "", message: "" });
-      setIsSubmitting(false);
-    }, 1500);
-  };
-
-  const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
-    setFormData({
-      ...formData,
-      [e.target.name]: e.target.value
-    });
-  };
-
-  const socialLinks = [
-    {
-      name: "GitHub",
-      icon: <Github className="w-6 h-6" />,
-      url: "https://github.com/charlles-augusto",
-      color: "hover:text-gray-400"
-    },
-    {
-      name: "LinkedIn",
-      icon: <Linkedin className="w-6 h-6" />,
-      url: "https://linkedin.com/in/charlles-augusto",
-      color: "hover:text-blue-400"
-    },
-    {
-      name: "Email",
-      icon: <Mail className="w-6 h-6" />,
-      url: "mailto:charlles.augusto@email.com",
-      color: "hover:text-primary"
-    }
-  ];
-
   return (
-    <section id="contact" className="py-20 bg-muted/20">
-      <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="text-center mb-16">
-          <h2 className="text-4xl md:text-5xl font-bold mb-6">
-            Vamos <span className="bg-gradient-primary bg-clip-text text-transparent">Conversar</span>
-          </h2>
-          <p className="text-xl text-muted-foreground max-w-3xl mx-auto">
-            Estou sempre aberto a novos desafios e oportunidades. Entre em contato!
-          </p>
-        </div>
+    <section 
+      id="contato" 
+      className="py-20 bg-gradient-to-br from-muted/50 to-background"
+    >
+      <div className="container mx-auto px-4">
+        <div className="max-w-6xl mx-auto">
+          <RevealSection className="text-center mb-16">
+            <h2 className="text-4xl font-bold text-primary mb-4">Entre em Contato</h2>
+            <p className="text-xl text-muted-foreground max-w-2xl mx-auto">
+              Vamos conversar sobre seu próximo projeto e como posso ajudar a transformar suas ideias em realidade
+            </p>
+          </RevealSection>
 
-        <div className="grid lg:grid-cols-2 gap-12">
-          {/* Contact Info */}
-          <motion.div 
-            className="space-y-8"
-            initial={{ opacity: 0, x: -30 }}
-            whileInView={{ opacity: 1, x: 0 }}
-            transition={{ duration: 0.7, ease: "easeOut" }}
-            viewport={{ once: true }}
-          >
-            <Card className="bg-gradient-card border-border/50 hover:shadow-tech transition-all duration-300">
-              <CardHeader>
-                <CardTitle className="flex items-center text-primary">
-                  <MapPin className="w-5 h-5 mr-2" />
-                  Localização
-                </CardTitle>
-              </CardHeader>
-              <CardContent>
-                <p className="text-muted-foreground">São Paulo, SP - Brasil</p>
-                <p className="text-sm text-muted-foreground mt-1">Disponível para trabalho remoto</p>
-              </CardContent>
-            </Card>
+          <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
+            {/* Contact Information */}
+            <RevealSection className="space-y-6">
+              <div>
+                <h3 className="text-2xl font-semibold mb-6 text-primary">Informações de Contato</h3>
+                
+                <div className="space-y-6">
+                  <Card className="border-primary/20 bg-gradient-card hover:shadow-tech transition-all duration-300">
+                    <CardContent className="p-4">
+                      <div className="flex items-center space-x-4">
+                        <div className="flex-shrink-0 w-12 h-12 bg-primary/10 rounded-lg flex items-center justify-center">
+                          <Mail className="h-6 w-6 text-primary" />
+                        </div>
+                        <div>
+                          <h4 className="font-medium text-lg">Email</h4>
+                          <a 
+                            href="mailto:charlles.floriano@aluno.senai.br"
+                            className="text-muted-foreground hover:text-primary transition-colors"
+                          >
+                            charlles.floriano@aluno.senai.br
+                          </a>
+                        </div>
+                      </div>
+                    </CardContent>
+                  </Card>
 
-            <Card className="bg-gradient-card border-border/50 hover:shadow-tech transition-all duration-300">
-              <CardHeader>
-                <CardTitle className="text-primary">Redes Sociais</CardTitle>
-                <CardDescription>Conecte-se comigo nas plataformas</CardDescription>
-              </CardHeader>
-              <CardContent>
-                <div className="flex space-x-6">
-                  {socialLinks.map((link) => (
-                    <a
-                      key={link.name}
-                      href={link.url}
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      className={`text-muted-foreground ${link.color} transition-colors duration-300 transform hover:scale-110`}
-                      title={link.name}
-                    >
-                      {link.icon}
-                    </a>
-                  ))}
+                  <Card className="border-primary/20 bg-gradient-card hover:shadow-tech transition-all duration-300">
+                    <CardContent className="p-4">
+                      <div className="flex items-center space-x-4">
+                        <div className="flex-shrink-0 w-12 h-12 bg-primary/10 rounded-lg flex items-center justify-center">
+                          <Phone className="h-6 w-6 text-primary" />
+                        </div>
+                        <div>
+                          <h4 className="font-medium text-lg">Telefone</h4>
+                          <a 
+                            href="tel:+5511999999999"
+                            className="text-muted-foreground hover:text-primary transition-colors"
+                          >
+                            +55 (11) 99999-9999
+                          </a>
+                        </div>
+                      </div>
+                    </CardContent>
+                  </Card>
+
+                  <Card className="border-primary/20 bg-gradient-card hover:shadow-tech transition-all duration-300">
+                    <CardContent className="p-4">
+                      <div className="flex items-center space-x-4">
+                        <div className="flex-shrink-0 w-12 h-12 bg-primary/10 rounded-lg flex items-center justify-center">
+                          <MapPin className="h-6 w-6 text-primary" />
+                        </div>
+                        <div>
+                          <h4 className="font-medium text-lg">Localização</h4>
+                          <p className="text-muted-foreground">São Paulo, Brasil</p>
+                        </div>
+                      </div>
+                    </CardContent>
+                  </Card>
                 </div>
-              </CardContent>
-            </Card>
+              </div>
 
-            <Card className="bg-gradient-card border-border/50 hover:shadow-tech transition-all duration-300">
-              <CardHeader>
-                <CardTitle className="text-primary">Disponibilidade</CardTitle>
-              </CardHeader>
-              <CardContent>
-                <div className="space-y-2">
-                  <div className="flex items-center">
-                    <div className="w-3 h-3 bg-green-500 rounded-full mr-3 animate-pulse"></div>
-                    <span className="text-foreground">Disponível para novos projetos</span>
-                  </div>
-                  <p className="text-sm text-muted-foreground ml-6">
-                    Resposta em até 24 horas
-                  </p>
-                </div>
-              </CardContent>
-            </Card>
-          </motion.div>
+              {/* Newsletter Signup */}
+              <NewsletterSignup />
+            </RevealSection>
 
-          {/* Contact Form */}
-          <motion.div
-            initial={{ opacity: 0, x: 30 }}
-            whileInView={{ opacity: 1, x: 0 }}
-            transition={{ duration: 0.7, ease: "easeOut" }}
-            viewport={{ once: true }}
-          >
-            <Card className="bg-gradient-card border-border/50 hover:shadow-tech transition-all duration-300">
-              <CardHeader>
-                <CardTitle className="text-primary">Envie uma Mensagem</CardTitle>
-                <CardDescription>
-                  Preencha o formulário e entrarei em contato em breve
-                </CardDescription>
-              </CardHeader>
-              <CardContent>
-                <form onSubmit={handleSubmit} className="space-y-6">
-                  <div>
-                    <Label htmlFor="name">Nome</Label>
-                    <Input
-                      id="name"
-                      name="name"
-                      type="text"
-                      required
-                      value={formData.name}
-                      onChange={handleChange}
-                      className="mt-1 bg-input border-border focus:ring-primary focus:border-primary"
-                      placeholder="Seu nome completo"
-                    />
-                  </div>
-
-                  <div>
-                    <Label htmlFor="email">Email</Label>
-                    <Input
-                      id="email"
-                      name="email"
-                      type="email"
-                      required
-                      value={formData.email}
-                      onChange={handleChange}
-                      className="mt-1 bg-input border-border focus:ring-primary focus:border-primary"
-                      placeholder="seu.email@exemplo.com"
-                    />
-                  </div>
-
-                  <div>
-                    <Label htmlFor="message">Mensagem</Label>
-                    <Textarea
-                      id="message"
-                      name="message"
-                      required
-                      rows={5}
-                      value={formData.message}
-                      onChange={handleChange}
-                      className="mt-1 bg-input border-border focus:ring-primary focus:border-primary resize-none"
-                      placeholder="Conte-me sobre seu projeto ou oportunidade..."
-                    />
-                  </div>
-
-                  <Button
-                    type="submit"
-                    disabled={isSubmitting}
-                    className="w-full bg-gradient-primary hover:shadow-emerald transition-all duration-300 text-lg py-6"
-                  >
-                    {isSubmitting ? (
-                      "Enviando..."
-                    ) : (
-                      <>
-                        <Send className="w-5 h-5 mr-2" />
-                        Enviar Mensagem
-                      </>
-                    )}
-                  </Button>
-                </form>
-              </CardContent>
-            </Card>
-          </motion.div>
+            {/* Contact Form - Takes 2 columns */}
+            <div className="lg:col-span-2">
+              <ContactForm />
+            </div>
+          </div>
         </div>
       </div>
     </section>

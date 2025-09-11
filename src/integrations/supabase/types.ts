@@ -14,6 +14,150 @@ export type Database = {
   }
   public: {
     Tables: {
+      analytics_events: {
+        Row: {
+          created_at: string
+          event_data: Json | null
+          event_type: string
+          id: string
+          ip_address: string | null
+          page_path: string | null
+          referrer: string | null
+          session_id: string | null
+          user_agent: string | null
+        }
+        Insert: {
+          created_at?: string
+          event_data?: Json | null
+          event_type: string
+          id?: string
+          ip_address?: string | null
+          page_path?: string | null
+          referrer?: string | null
+          session_id?: string | null
+          user_agent?: string | null
+        }
+        Update: {
+          created_at?: string
+          event_data?: Json | null
+          event_type?: string
+          id?: string
+          ip_address?: string | null
+          page_path?: string | null
+          referrer?: string | null
+          session_id?: string | null
+          user_agent?: string | null
+        }
+        Relationships: []
+      }
+      articles: {
+        Row: {
+          category: string
+          content: string
+          created_at: string
+          display_order: number
+          excerpt: string
+          featured_image: string | null
+          id: string
+          is_featured: boolean
+          is_published: boolean
+          published_at: string | null
+          read_time: number | null
+          seo_description: string | null
+          seo_title: string | null
+          slug: string
+          tags: string[] | null
+          title: string
+          updated_at: string
+          views_count: number
+        }
+        Insert: {
+          category: string
+          content: string
+          created_at?: string
+          display_order?: number
+          excerpt: string
+          featured_image?: string | null
+          id?: string
+          is_featured?: boolean
+          is_published?: boolean
+          published_at?: string | null
+          read_time?: number | null
+          seo_description?: string | null
+          seo_title?: string | null
+          slug: string
+          tags?: string[] | null
+          title: string
+          updated_at?: string
+          views_count?: number
+        }
+        Update: {
+          category?: string
+          content?: string
+          created_at?: string
+          display_order?: number
+          excerpt?: string
+          featured_image?: string | null
+          id?: string
+          is_featured?: boolean
+          is_published?: boolean
+          published_at?: string | null
+          read_time?: number | null
+          seo_description?: string | null
+          seo_title?: string | null
+          slug?: string
+          tags?: string[] | null
+          title?: string
+          updated_at?: string
+          views_count?: number
+        }
+        Relationships: []
+      }
+      contact_messages: {
+        Row: {
+          company: string | null
+          created_at: string
+          email: string
+          id: string
+          is_spam: boolean
+          message: string
+          name: string
+          phone: string | null
+          replied_at: string | null
+          status: string
+          subject: string
+          updated_at: string
+        }
+        Insert: {
+          company?: string | null
+          created_at?: string
+          email: string
+          id?: string
+          is_spam?: boolean
+          message: string
+          name: string
+          phone?: string | null
+          replied_at?: string | null
+          status?: string
+          subject: string
+          updated_at?: string
+        }
+        Update: {
+          company?: string | null
+          created_at?: string
+          email?: string
+          id?: string
+          is_spam?: boolean
+          message?: string
+          name?: string
+          phone?: string | null
+          replied_at?: string | null
+          status?: string
+          subject?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
       education: {
         Row: {
           created_at: string
@@ -107,6 +251,36 @@ export type Database = {
         }
         Relationships: []
       }
+      newsletter_subscribers: {
+        Row: {
+          email: string
+          id: string
+          is_active: boolean
+          name: string | null
+          source: string | null
+          subscribed_at: string
+          unsubscribed_at: string | null
+        }
+        Insert: {
+          email: string
+          id?: string
+          is_active?: boolean
+          name?: string | null
+          source?: string | null
+          subscribed_at?: string
+          unsubscribed_at?: string | null
+        }
+        Update: {
+          email?: string
+          id?: string
+          is_active?: boolean
+          name?: string | null
+          source?: string | null
+          subscribed_at?: string
+          unsubscribed_at?: string | null
+        }
+        Relationships: []
+      }
       projects: {
         Row: {
           created_at: string
@@ -148,6 +322,57 @@ export type Database = {
           name?: string
           status?: string
           technologies?: string[]
+          updated_at?: string
+        }
+        Relationships: []
+      }
+      testimonials: {
+        Row: {
+          client_company: string | null
+          client_image: string | null
+          client_name: string
+          client_position: string | null
+          content: string
+          created_at: string
+          display_order: number
+          id: string
+          is_approved: boolean
+          is_featured: boolean
+          project_reference: string | null
+          rating: number
+          status: string
+          updated_at: string
+        }
+        Insert: {
+          client_company?: string | null
+          client_image?: string | null
+          client_name: string
+          client_position?: string | null
+          content: string
+          created_at?: string
+          display_order?: number
+          id?: string
+          is_approved?: boolean
+          is_featured?: boolean
+          project_reference?: string | null
+          rating: number
+          status?: string
+          updated_at?: string
+        }
+        Update: {
+          client_company?: string | null
+          client_image?: string | null
+          client_name?: string
+          client_position?: string | null
+          content?: string
+          created_at?: string
+          display_order?: number
+          id?: string
+          is_approved?: boolean
+          is_featured?: boolean
+          project_reference?: string | null
+          rating?: number
+          status?: string
           updated_at?: string
         }
         Relationships: []
