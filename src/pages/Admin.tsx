@@ -12,6 +12,7 @@ import ExperiencesManager from "@/components/admin/ExperiencesManager";
 import EducationManager from "@/components/admin/EducationManager";
 import ContactMessagesManager from "@/components/admin/ContactMessagesManager";
 import TestimonialsManager from "@/components/admin/TestimonialsManager";
+import AdminDashboard from "@/components/admin/AdminDashboard";
 
 const Admin = () => {
   const [user, setUser] = useState<User | null>(null);
@@ -90,14 +91,19 @@ const Admin = () => {
       </header>
 
       <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-        <Tabs defaultValue="projects" className="space-y-6">
-          <TabsList className="grid w-full grid-cols-5 mb-8">
+        <Tabs defaultValue="dashboard" className="space-y-6">
+          <TabsList className="grid w-full grid-cols-6 mb-8">
+            <TabsTrigger value="dashboard">Dashboard</TabsTrigger>
             <TabsTrigger value="projects">Projetos</TabsTrigger>
             <TabsTrigger value="experiences">Experiências</TabsTrigger>
             <TabsTrigger value="education">Formação</TabsTrigger>
             <TabsTrigger value="testimonials">Testimonials</TabsTrigger>
             <TabsTrigger value="messages">Mensagens</TabsTrigger>
           </TabsList>
+          
+          <TabsContent value="dashboard">
+            <AdminDashboard />
+          </TabsContent>
           
           <TabsContent value="projects">
             <ProjectsManager />
