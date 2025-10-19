@@ -3,34 +3,51 @@ import { useQuery } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
 import { SEO } from '@/components/SEO';
 import Navigation from '@/components/Navigation';
-import { Input } from '@/components/ui/input';
-import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
-import { Calendar, Clock, Search, Tag } from 'lucide-react';
+import { BlogSearch, SearchFilters } from '@/components/ui/blog-search';
+import { Calendar, Clock, Tag } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 
 const Blog = () => {
   const { t } = useTranslation();
   const [searchQuery, setSearchQuery] = useState('');
-  const [selectedCategory, setSelectedCategory] = useState<string | null>(null);
+  const [filters, setFilters] = useState<SearchFilters>({
+    tags: [],
+    sortBy: 'recent',
+  });
 
   const { data: articles, isLoading } = useQuery({
-    queryKey: ['articles', searchQuery, selectedCategory],
+    queryKey: ['articles', searchQuery, filters],
     queryFn: async () => {
       let query = supabase
         .from('articles')
         .select('*')
-        .eq('is_published', true)
-        .order('published_at', { ascending: false });
+        .eq('is_published', true);
 
       if (searchQuery) {
-        query = query.or(`title.ilike.%${searchQuery}%,content.ilike.%${searchQuery}%,tags.cs.{${searchQuery}}`);
+        query = query.or(`title.ilike.%${searchQuery}%,content.ilike.%${searchQuery}%,excerpt.ilike.%${searchQuery}%`);
       }
 
-      if (selectedCategory) {
-        query = query.eq('category', selectedCategory);
+      if (filters.category) {
+        query = query.eq('category', filters.category);
+      }
+
+      if (filters.tags.length > 0) {
+        query = query.overlaps('tags', filters.tags);
+      }
+
+      // Apply sorting
+      switch (filters.sortBy) {
+        case 'popular':
+          query = query.order('views_count', { ascending: false });
+          break;
+        case 'relevant':
+          query = query.order('is_featured', { ascending: false });
+          break;
+        default:
+          query = query.order('published_at', { ascending: false });
       }
 
       const { data, error } = await query;
@@ -52,6 +69,25 @@ const Blog = () => {
     },
   });
 
+  const { data: allTags } = useQuery({
+    queryKey: ['all-tags'],
+    queryFn: async () => {
+      const { data, error } = await supabase
+        .from('articles')
+        .select('tags')
+        .eq('is_published', true);
+      
+      if (error) throw error;
+      const tags = data.flatMap(a => a.tags || []);
+      return [...new Set(tags)];
+    },
+  });
+
+  const handleSearch = (query: string, newFilters: SearchFilters) => {
+    setSearchQuery(query);
+    setFilters(newFilters);
+  };
+
   return (
     <>
       <SEO 
@@ -69,37 +105,11 @@ const Blog = () => {
               {t('blog.subtitle', 'Articles, tutorials and insights')}
             </p>
 
-            <div className="flex flex-col md:flex-row gap-4 mb-8">
-              <div className="relative flex-1">
-                <Search className="absolute left-3 top-3 h-4 w-4 text-muted-foreground" />
-                <Input
-                  placeholder={t('blog.search', 'Search articles...')}
-                  value={searchQuery}
-                  onChange={(e) => setSearchQuery(e.target.value)}
-                  className="pl-10"
-                />
-              </div>
-            </div>
-
-            <div className="flex flex-wrap gap-2 mb-8">
-              <Button
-                variant={selectedCategory === null ? 'default' : 'outline'}
-                size="sm"
-                onClick={() => setSelectedCategory(null)}
-              >
-                {t('blog.all', 'All')}
-              </Button>
-              {categories?.map((category) => (
-                <Button
-                  key={category}
-                  variant={selectedCategory === category ? 'default' : 'outline'}
-                  size="sm"
-                  onClick={() => setSelectedCategory(category)}
-                >
-                  {category}
-                </Button>
-              ))}
-            </div>
+            <BlogSearch 
+              onSearch={handleSearch}
+              categories={categories || []}
+              tags={allTags || []}
+            />
           </div>
 
           <div className="max-w-4xl mx-auto space-y-6">

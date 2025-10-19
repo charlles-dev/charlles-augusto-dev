@@ -13,6 +13,9 @@ import EducationManager from "@/components/admin/EducationManager";
 import ContactMessagesManager from "@/components/admin/ContactMessagesManager";
 import TestimonialsManager from "@/components/admin/TestimonialsManager";
 import AdminDashboard from "@/components/admin/AdminDashboard";
+import { BlogManager } from '@/components/admin/BlogManager';
+import { CommentsManager } from '@/components/admin/CommentsManager';
+import { NewsletterManager } from '@/components/admin/NewsletterManager';
 
 const Admin = () => {
   const [user, setUser] = useState<User | null>(null);
@@ -92,8 +95,11 @@ const Admin = () => {
 
       <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
         <Tabs defaultValue="dashboard" className="space-y-6">
-          <TabsList className="grid w-full grid-cols-6 mb-8">
+          <TabsList className="grid w-full grid-cols-9 mb-8">
             <TabsTrigger value="dashboard">Dashboard</TabsTrigger>
+            <TabsTrigger value="blog">Blog</TabsTrigger>
+            <TabsTrigger value="comments">Comments</TabsTrigger>
+            <TabsTrigger value="newsletter">Newsletter</TabsTrigger>
             <TabsTrigger value="projects">Projetos</TabsTrigger>
             <TabsTrigger value="experiences">Experiências</TabsTrigger>
             <TabsTrigger value="education">Formação</TabsTrigger>
@@ -103,6 +109,18 @@ const Admin = () => {
           
           <TabsContent value="dashboard">
             <AdminDashboard />
+          </TabsContent>
+
+          <TabsContent value="blog">
+            <BlogManager />
+          </TabsContent>
+
+          <TabsContent value="comments">
+            <CommentsManager />
+          </TabsContent>
+
+          <TabsContent value="newsletter">
+            <NewsletterManager />
           </TabsContent>
           
           <TabsContent value="projects">
