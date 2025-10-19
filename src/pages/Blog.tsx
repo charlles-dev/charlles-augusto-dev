@@ -57,7 +57,7 @@ const Blog = () => {
       <SEO 
         title="Blog"
         description="Articles, tutorials and insights about web development, design and technology"
-        type="blog"
+        type="website"
       />
       <div className="min-h-screen bg-gradient-bg">
         <Navigation />

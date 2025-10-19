@@ -9,6 +9,17 @@ import { Avatar, AvatarFallback } from '@/components/ui/avatar';
 import { toast } from 'sonner';
 import { MessageSquare } from 'lucide-react';
 
+interface Comment {
+  id: string;
+  article_id: string;
+  author_name: string;
+  author_email: string;
+  content: string;
+  is_approved: boolean;
+  created_at: string;
+  updated_at: string;
+}
+
 interface CommentsSectionProps {
   articleId: string;
 }
@@ -19,7 +30,7 @@ export const CommentsSection = ({ articleId }: CommentsSectionProps) => {
   const [content, setContent] = useState('');
   const queryClient = useQueryClient();
 
-  const { data: comments, isLoading } = useQuery({
+  const { data: comments, isLoading } = useQuery<Comment[]>({
     queryKey: ['comments', articleId],
     queryFn: async () => {
       const { data, error } = await supabase
@@ -30,7 +41,7 @@ export const CommentsSection = ({ articleId }: CommentsSectionProps) => {
         .order('created_at', { ascending: false });
 
       if (error) throw error;
-      return data;
+      return data as Comment[];
     },
   });
 
@@ -44,13 +55,13 @@ export const CommentsSection = ({ articleId }: CommentsSectionProps) => {
             author_name: newComment.name,
             author_email: newComment.email,
             content: newComment.content,
-          },
+          } as any,
         ])
         .select()
         .single();
 
       if (error) throw error;
-      return data;
+      return data as Comment;
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['comments', articleId] });

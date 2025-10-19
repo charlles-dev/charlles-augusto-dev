@@ -84,7 +84,7 @@ const BlogPost = () => {
       <SEO 
         title={article.seo_title || article.title}
         description={article.seo_description || article.excerpt}
-        keywords={article.tags?.join(', ')}
+        keywords={article.tags || []}
         image={article.featured_image}
         type="article"
       />
