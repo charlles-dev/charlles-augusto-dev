@@ -14,12 +14,15 @@ export const RelatedArticles = ({ currentArticleId, category }: RelatedArticlesP
   const { data: relatedArticles } = useQuery({
     queryKey: ['related-articles', currentArticleId, category],
     queryFn: async () => {
+      // Fetch articles from same category, ordered by views and likes
       const { data, error } = await supabase
         .from('articles')
         .select('*')
         .eq('category', category)
         .eq('is_published', true)
         .neq('id', currentArticleId)
+        .order('views_count', { ascending: false })
+        .order('likes_count', { ascending: false })
         .limit(3);
 
       if (error) throw error;
@@ -33,23 +36,25 @@ export const RelatedArticles = ({ currentArticleId, category }: RelatedArticlesP
 
   return (
     <div className="space-y-6">
-      <h2 className="text-2xl font-bold">Related Articles</h2>
+      <h2 className="text-2xl font-bold">Artigos Relacionados</h2>
       <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
         {relatedArticles.map((article) => (
           <Link key={article.id} to={`/blog/${article.slug}`}>
-            <Card className="h-full hover:shadow-lg transition-shadow cursor-pointer">
+            <Card className="h-full hover:shadow-lg hover:border-primary/50 transition-all cursor-pointer group">
               {article.featured_image && (
-                <img 
-                  src={article.featured_image} 
-                  alt={article.title}
-                  className="w-full h-40 object-cover rounded-t-lg"
-                />
+                <div className="overflow-hidden rounded-t-lg">
+                  <img 
+                    src={article.featured_image} 
+                    alt={article.title}
+                    className="w-full h-40 object-cover group-hover:scale-105 transition-transform duration-300"
+                  />
+                </div>
               )}
               <CardHeader>
                 <Badge variant="secondary" className="w-fit mb-2">
                   {article.category}
                 </Badge>
-                <CardTitle className="text-lg line-clamp-2 hover:text-primary transition-colors">
+                <CardTitle className="text-lg line-clamp-2 group-hover:text-primary transition-colors">
                   {article.title}
                 </CardTitle>
                 <CardDescription className="line-clamp-2">
@@ -60,7 +65,7 @@ export const RelatedArticles = ({ currentArticleId, category }: RelatedArticlesP
                 <div className="flex items-center gap-3 text-xs text-muted-foreground">
                   <div className="flex items-center gap-1">
                     <Calendar className="h-3 w-3" />
-                    {new Date(article.published_at || article.created_at).toLocaleDateString()}
+                    {new Date(article.published_at || article.created_at).toLocaleDateString('pt-BR')}
                   </div>
                   {article.read_time && (
                     <div className="flex items-center gap-1">

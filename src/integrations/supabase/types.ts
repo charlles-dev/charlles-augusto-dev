@@ -91,6 +91,30 @@ export type Database = {
           },
         ]
       }
+      article_reactions: {
+        Row: {
+          article_id: string
+          created_at: string
+          id: string
+          reaction_type: string
+          user_ip: string
+        }
+        Insert: {
+          article_id: string
+          created_at?: string
+          id?: string
+          reaction_type?: string
+          user_ip: string
+        }
+        Update: {
+          article_id?: string
+          created_at?: string
+          id?: string
+          reaction_type?: string
+          user_ip?: string
+        }
+        Relationships: []
+      }
       articles: {
         Row: {
           category: string
@@ -102,6 +126,7 @@ export type Database = {
           id: string
           is_featured: boolean
           is_published: boolean
+          likes_count: number
           published_at: string | null
           read_time: number | null
           seo_description: string | null
@@ -122,6 +147,7 @@ export type Database = {
           id?: string
           is_featured?: boolean
           is_published?: boolean
+          likes_count?: number
           published_at?: string | null
           read_time?: number | null
           seo_description?: string | null
@@ -142,6 +168,7 @@ export type Database = {
           id?: string
           is_featured?: boolean
           is_published?: boolean
+          likes_count?: number
           published_at?: string | null
           read_time?: number | null
           seo_description?: string | null

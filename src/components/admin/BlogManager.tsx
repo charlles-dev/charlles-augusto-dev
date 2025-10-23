@@ -11,7 +11,8 @@ import { Label } from '@/components/ui/label';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { toast } from 'sonner';
-import { Pencil, Trash2, Plus, Eye, FileText } from 'lucide-react';
+import { Pencil, Trash2, Plus, Eye, FileText, Heart } from 'lucide-react';
+import { MarkdownEditor } from './MarkdownEditor';
 
 interface Article {
   id: string;
@@ -25,6 +26,7 @@ interface Article {
   is_published: boolean;
   is_featured: boolean;
   views_count: number;
+  likes_count: number;
   read_time?: number;
   seo_title?: string;
   seo_description?: string;
@@ -149,13 +151,17 @@ export const BlogManager = () => {
                     <div className="flex items-center gap-4 text-sm text-muted-foreground">
                       <span className="flex items-center gap-1">
                         <Eye className="h-4 w-4" />
-                        {article.views_count} views
+                        {article.views_count}
+                      </span>
+                      <span className="flex items-center gap-1">
+                        <Heart className="h-4 w-4" />
+                        {article.likes_count || 0}
                       </span>
                       <span className="flex items-center gap-1">
                         <FileText className="h-4 w-4" />
                         {article.category}
                       </span>
-                      {article.read_time && <span>{article.read_time} min read</span>}
+                      {article.read_time && <span>{article.read_time} min</span>}
                     </div>
                   </div>
                   <div className="flex flex-col gap-2">
@@ -298,11 +304,10 @@ const ArticleForm = ({ article, onClose }: { article: Article | null; onClose: (
         </div>
         <div>
           <Label>Content *</Label>
-          <Textarea
+          <MarkdownEditor
             value={formData.content}
-            onChange={(e) => setFormData({ ...formData, content: e.target.value })}
-            placeholder="Article content (HTML supported)"
-            rows={10}
+            onChange={(content) => setFormData({ ...formData, content })}
+            placeholder="Escreva o conteúdo do artigo em Markdown..."
           />
         </div>
         <div className="grid grid-cols-2 gap-4">

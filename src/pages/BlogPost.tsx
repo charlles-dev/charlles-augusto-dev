@@ -7,10 +7,13 @@ import Navigation from '@/components/Navigation';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Separator } from '@/components/ui/separator';
-import { Calendar, Clock, ArrowLeft, Share2, Tag } from 'lucide-react';
+import { Calendar, Clock, ArrowLeft, Share2, Tag, Eye } from 'lucide-react';
 import { toast } from 'sonner';
 import { CommentsSection } from '@/components/blog/CommentsSection';
 import { RelatedArticles } from '@/components/blog/RelatedArticles';
+import { Breadcrumbs } from '@/components/ui/breadcrumbs';
+import { ArticleReactions } from '@/components/blog/ArticleReactions';
+import { usePageSEO } from '@/hooks/usePageSEO';
 
 const BlogPost = () => {
   const { slug } = useParams<{ slug: string }>();
@@ -23,11 +26,20 @@ const BlogPost = () => {
         .select('*')
         .eq('slug', slug)
         .eq('is_published', true)
-        .single();
+        .maybeSingle();
 
       if (error) throw error;
       return data;
     },
+  });
+
+  // Dynamic SEO
+  usePageSEO({
+    title: article?.seo_title || article?.title,
+    description: article?.seo_description || article?.excerpt,
+    keywords: article?.tags || [],
+    image: article?.featured_image,
+    type: 'article'
   });
 
   useEffect(() => {
@@ -92,10 +104,14 @@ const BlogPost = () => {
         <Navigation />
         
         <article className="container mx-auto px-4 pt-24 pb-12 max-w-4xl">
-          <Link to="/blog" className="inline-flex items-center text-muted-foreground hover:text-foreground mb-8">
-            <ArrowLeft className="mr-2 h-4 w-4" />
-            Back to Blog
-          </Link>
+          <Breadcrumbs 
+            items={[
+              { label: 'Blog', href: '/blog' },
+              { label: article.category, href: `/blog?category=${article.category}` },
+              { label: article.title, current: true }
+            ]}
+            className="mb-8"
+          />
 
           <header className="mb-8">
             <div className="flex flex-wrap gap-2 mb-4">
@@ -116,7 +132,7 @@ const BlogPost = () => {
             <div className="flex flex-wrap items-center gap-4 text-sm text-muted-foreground mb-6">
               <div className="flex items-center gap-1">
                 <Calendar className="h-4 w-4" />
-                {new Date(article.published_at || article.created_at).toLocaleDateString('en-US', {
+                {new Date(article.published_at || article.created_at).toLocaleDateString('pt-BR', {
                   year: 'numeric',
                   month: 'long',
                   day: 'numeric'
@@ -125,22 +141,28 @@ const BlogPost = () => {
               {article.read_time && (
                 <div className="flex items-center gap-1">
                   <Clock className="h-4 w-4" />
-                  {article.read_time} min read
+                  {article.read_time} min
                 </div>
               )}
               <div className="flex items-center gap-1">
-                <Tag className="h-4 w-4" />
-                {article.views_count} views
+                <Eye className="h-4 w-4" />
+                {article.views_count}
               </div>
-              <Button
-                variant="ghost"
-                size="sm"
-                onClick={handleShare}
-                className="ml-auto"
-              >
-                <Share2 className="h-4 w-4 mr-2" />
-                Share
-              </Button>
+              
+              <div className="ml-auto flex items-center gap-2">
+                <ArticleReactions 
+                  articleId={article.id} 
+                  initialLikes={article.likes_count || 0}
+                />
+                <Button
+                  variant="outline"
+                  size="sm"
+                  onClick={handleShare}
+                >
+                  <Share2 className="h-4 w-4 mr-2" />
+                  Compartilhar
+                </Button>
+              </div>
             </div>
 
             {article.tags && article.tags.length > 0 && (
