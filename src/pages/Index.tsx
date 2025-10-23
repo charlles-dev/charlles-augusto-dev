@@ -6,6 +6,7 @@ import { SectionSkeleton } from "@/components/loading/SectionSkeleton";
 import { ScrollProgress } from "@/components/ui/scroll-progress";
 import { FloatingElement } from "@/components/ui/floating-elements";
 import { SEO } from "@/components/SEO";
+import { usePageSEO } from "@/hooks/usePageSEO";
 
 // Lazy loading dos componentes por seção
 const About = lazy(() => import("@/components/About"));
@@ -19,6 +20,13 @@ const Footer = lazy(() => import("@/components/Footer"));
 const TestimonialsSection = lazy(() => import("@/components/advanced/TestimonialsSection"));
 
 const Index = () => {
+  usePageSEO({
+    title: 'Charlles Augusto - Desenvolvedor Full-Stack',
+    description: 'Desenvolvedor Full-Stack especializado em Cybersecurity com experiência em Python, React, Java, Golang e IA. Transformando ideias em soluções digitais seguras e escaláveis.',
+    keywords: ['desenvolvedor full stack', 'cybersecurity', 'python', 'react', 'java', 'golang', 'inteligência artificial', 'desenvolvimento web', 'segurança digital'],
+    type: 'profile'
+  });
+
   return (
     <>
       <SEO />
