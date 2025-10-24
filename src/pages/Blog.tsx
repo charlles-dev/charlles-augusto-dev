@@ -1,36 +1,58 @@
 import { useState, useEffect } from 'react';
-import { useQuery } from '@tanstack/react-query';
+import { useInfiniteQuery, useQuery } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
 import { useAnalytics } from '@/hooks/useAnalytics';
+import { useLocalStorage } from '@/hooks/useLocalStorage';
+import { useInfiniteScroll } from '@/hooks/useInfiniteScroll';
 import { SEO } from '@/components/SEO';
 import Navigation from '@/components/Navigation';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { BlogSearch, SearchFilters } from '@/components/ui/blog-search';
+import { BlogSkeletonList } from '@/components/loading/BlogSkeleton';
 import { Calendar, Clock, Tag } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
+import { motion } from 'framer-motion';
+
+const ARTICLES_PER_PAGE = 6;
 
 const Blog = () => {
   const { t } = useTranslation();
   const { trackPageView } = useAnalytics();
-  const [searchQuery, setSearchQuery] = useState('');
-  const [filters, setFilters] = useState<SearchFilters>({
+  
+  // Save filters to localStorage
+  const [savedFilters, setSavedFilters] = useLocalStorage<SearchFilters>('blog-filters', {
     tags: [],
     sortBy: 'recent',
   });
+  
+  const [searchQuery, setSearchQuery] = useState('');
+  const [filters, setFilters] = useState<SearchFilters>(savedFilters);
 
   useEffect(() => {
     trackPageView('/blog');
   }, [trackPageView]);
 
-  const { data: articles, isLoading } = useQuery({
+  useEffect(() => {
+    setSavedFilters(filters);
+  }, [filters, setSavedFilters]);
+
+  // Infinite scroll query
+  const {
+    data,
+    fetchNextPage,
+    hasNextPage,
+    isFetchingNextPage,
+    isLoading,
+  } = useInfiniteQuery({
     queryKey: ['articles', searchQuery, filters],
-    queryFn: async () => {
+    queryFn: async ({ pageParam = 0 }) => {
       let query = supabase
         .from('articles')
-        .select('*')
-        .eq('is_published', true);
+        .select('*', { count: 'exact' })
+        .eq('is_published', true)
+        .range(pageParam, pageParam + ARTICLES_PER_PAGE - 1);
 
       if (searchQuery) {
         query = query.or(`title.ilike.%${searchQuery}%,content.ilike.%${searchQuery}%,excerpt.ilike.%${searchQuery}%`);
@@ -56,10 +78,23 @@ const Blog = () => {
           query = query.order('published_at', { ascending: false });
       }
 
-      const { data, error } = await query;
+      const { data, error, count } = await query;
       if (error) throw error;
-      return data;
+      return { data, count };
     },
+    getNextPageParam: (lastPage, allPages) => {
+      const nextPage = allPages.length * ARTICLES_PER_PAGE;
+      return lastPage.count && nextPage < lastPage.count ? nextPage : undefined;
+    },
+    initialPageParam: 0,
+  });
+
+  const articles = data?.pages.flatMap(page => page.data) || [];
+  
+  const loadMoreRef = useInfiniteScroll({
+    onLoadMore: () => fetchNextPage(),
+    hasMore: !!hasNextPage,
+    isLoading: isFetchingNextPage
   });
 
   const { data: categories } = useQuery({
@@ -120,68 +155,89 @@ const Blog = () => {
 
           <div className="max-w-4xl mx-auto space-y-6">
             {isLoading ? (
-              <div className="text-center py-12">
-                <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary mx-auto"></div>
-              </div>
-            ) : articles?.length === 0 ? (
+              <BlogSkeletonList count={6} />
+            ) : articles.length === 0 ? (
               <div className="text-center py-12">
                 <p className="text-muted-foreground">{t('blog.noArticles', 'No articles found')}</p>
               </div>
             ) : (
-              articles?.map((article) => (
-                <Link key={article.id} to={`/blog/${article.slug}`}>
-                  <Card className="hover:shadow-lg transition-shadow cursor-pointer">
-                    {article.featured_image && (
-                      <img 
-                        src={article.featured_image} 
-                        alt={article.title}
-                        className="w-full h-48 object-cover rounded-t-lg"
-                      />
-                    )}
-                    <CardHeader>
-                      <div className="flex flex-wrap gap-2 mb-2">
-                        <Badge variant="secondary">{article.category}</Badge>
-                        {article.is_featured && (
-                          <Badge variant="default">Featured</Badge>
-                        )}
-                      </div>
-                      <CardTitle className="text-2xl hover:text-primary transition-colors">
-                        {article.title}
-                      </CardTitle>
-                      <CardDescription className="text-base">
-                        {article.excerpt}
-                      </CardDescription>
-                    </CardHeader>
-                    <CardContent>
-                      <div className="flex flex-wrap items-center gap-4 text-sm text-muted-foreground">
-                        <div className="flex items-center gap-1">
-                          <Calendar className="h-4 w-4" />
-                          {new Date(article.published_at || article.created_at).toLocaleDateString()}
-                        </div>
-                        {article.read_time && (
-                          <div className="flex items-center gap-1">
-                            <Clock className="h-4 w-4" />
-                            {article.read_time} min read
+              <>
+                {articles.map((article, index) => (
+                  <motion.div
+                    key={article.id}
+                    initial={{ opacity: 0, y: 20 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    transition={{ delay: index * 0.1 }}
+                  >
+                    <Link to={`/blog/${article.slug}`}>
+                      <Card className="hover:shadow-lg hover:scale-[1.01] transition-all duration-300 cursor-pointer group">
+                        {article.featured_image && (
+                          <div className="overflow-hidden">
+                            <img 
+                              src={article.featured_image} 
+                              alt={article.title}
+                              className="w-full h-48 object-cover rounded-t-lg group-hover:scale-105 transition-transform duration-300"
+                            />
                           </div>
                         )}
-                        <div className="flex items-center gap-1">
-                          <Tag className="h-4 w-4" />
-                          {article.views_count} views
-                        </div>
-                      </div>
-                      {article.tags && article.tags.length > 0 && (
-                        <div className="flex flex-wrap gap-2 mt-4">
-                          {article.tags.map((tag: string) => (
-                            <Badge key={tag} variant="outline" className="text-xs">
-                              {tag}
-                            </Badge>
-                          ))}
-                        </div>
-                      )}
-                    </CardContent>
-                  </Card>
-                </Link>
-              ))
+                        <CardHeader>
+                          <div className="flex flex-wrap gap-2 mb-2">
+                            <Badge variant="secondary">{article.category}</Badge>
+                            {article.is_featured && (
+                              <Badge variant="default">Featured</Badge>
+                            )}
+                          </div>
+                          <CardTitle className="text-2xl group-hover:text-primary transition-colors">
+                            {article.title}
+                          </CardTitle>
+                          <CardDescription className="text-base">
+                            {article.excerpt}
+                          </CardDescription>
+                        </CardHeader>
+                        <CardContent>
+                          <div className="flex flex-wrap items-center gap-4 text-sm text-muted-foreground">
+                            <div className="flex items-center gap-1">
+                              <Calendar className="h-4 w-4" />
+                              {new Date(article.published_at || article.created_at).toLocaleDateString()}
+                            </div>
+                            {article.read_time && (
+                              <div className="flex items-center gap-1">
+                                <Clock className="h-4 w-4" />
+                                {article.read_time} min read
+                              </div>
+                            )}
+                            <div className="flex items-center gap-1">
+                              <Tag className="h-4 w-4" />
+                              {article.views_count} views
+                            </div>
+                          </div>
+                          {article.tags && article.tags.length > 0 && (
+                            <div className="flex flex-wrap gap-2 mt-4">
+                              {article.tags.map((tag: string) => (
+                                <Badge key={tag} variant="outline" className="text-xs">
+                                  {tag}
+                                </Badge>
+                              ))}
+                            </div>
+                          )}
+                        </CardContent>
+                      </Card>
+                    </Link>
+                  </motion.div>
+                ))}
+                
+                {/* Infinite scroll trigger */}
+                <div ref={loadMoreRef} className="py-8">
+                  {isFetchingNextPage && (
+                    <BlogSkeletonList count={3} />
+                  )}
+                  {!hasNextPage && articles.length > 0 && (
+                    <p className="text-center text-muted-foreground">
+                      {t('blog.noMoreArticles', 'No more articles to load')}
+                    </p>
+                  )}
+                </div>
+              </>
             )}
           </div>
         </main>

@@ -16,6 +16,7 @@ import AdminDashboard from "@/components/admin/AdminDashboard";
 import { BlogManager } from '@/components/admin/BlogManager';
 import { CommentsManager } from '@/components/admin/CommentsManager';
 import { NewsletterManager } from '@/components/admin/NewsletterManager';
+import { ThemeCustomizer } from '@/components/theme/ThemeCustomizer';
 
 const Admin = () => {
   const [user, setUser] = useState<User | null>(null);
@@ -95,16 +96,17 @@ const Admin = () => {
 
       <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
         <Tabs defaultValue="dashboard" className="space-y-6">
-          <TabsList className="grid w-full grid-cols-9 mb-8">
+          <TabsList className="grid w-full grid-cols-10 mb-8">
             <TabsTrigger value="dashboard">Dashboard</TabsTrigger>
             <TabsTrigger value="blog">Blog</TabsTrigger>
-            <TabsTrigger value="comments">Comments</TabsTrigger>
-            <TabsTrigger value="newsletter">Newsletter</TabsTrigger>
+            <TabsTrigger value="comments">Comentários</TabsTrigger>
             <TabsTrigger value="projects">Projetos</TabsTrigger>
             <TabsTrigger value="experiences">Experiências</TabsTrigger>
-            <TabsTrigger value="education">Formação</TabsTrigger>
-            <TabsTrigger value="testimonials">Testimonials</TabsTrigger>
+            <TabsTrigger value="education">Educação</TabsTrigger>
+            <TabsTrigger value="testimonials">Depoimentos</TabsTrigger>
             <TabsTrigger value="messages">Mensagens</TabsTrigger>
+            <TabsTrigger value="newsletter">Newsletter</TabsTrigger>
+            <TabsTrigger value="theme">Tema</TabsTrigger>
           </TabsList>
           
           <TabsContent value="dashboard">
@@ -141,6 +143,10 @@ const Admin = () => {
           
           <TabsContent value="messages">
             <ContactMessagesManager />
+          </TabsContent>
+
+          <TabsContent value="theme">
+            <ThemeCustomizer />
           </TabsContent>
         </Tabs>
       </main>

@@ -142,6 +142,8 @@ export default {
       },
       transitionTimingFunction: {
         'tech': 'var(--transition-tech)',
+        'smooth': 'var(--transition-smooth)',
+        'bounce': 'var(--transition-bounce)',
       },
     },
   },
