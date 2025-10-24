@@ -1,6 +1,7 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useQuery } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
+import { useAnalytics } from '@/hooks/useAnalytics';
 import { SEO } from '@/components/SEO';
 import Navigation from '@/components/Navigation';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
@@ -12,11 +13,16 @@ import { useTranslation } from 'react-i18next';
 
 const Blog = () => {
   const { t } = useTranslation();
+  const { trackPageView } = useAnalytics();
   const [searchQuery, setSearchQuery] = useState('');
   const [filters, setFilters] = useState<SearchFilters>({
     tags: [],
     sortBy: 'recent',
   });
+
+  useEffect(() => {
+    trackPageView('/blog');
+  }, [trackPageView]);
 
   const { data: articles, isLoading } = useQuery({
     queryKey: ['articles', searchQuery, filters],

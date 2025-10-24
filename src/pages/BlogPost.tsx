@@ -3,6 +3,7 @@ import { useParams, Link } from 'react-router-dom';
 import { useQuery } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
 import { SEO } from '@/components/SEO';
+import { useAnalytics } from '@/hooks/useAnalytics';
 import Navigation from '@/components/Navigation';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
@@ -17,6 +18,7 @@ import { usePageSEO } from '@/hooks/usePageSEO';
 
 const BlogPost = () => {
   const { slug } = useParams<{ slug: string }>();
+  const { trackPageView, trackEvent } = useAnalytics();
 
   const { data: article, isLoading } = useQuery({
     queryKey: ['article', slug],
@@ -44,6 +46,18 @@ const BlogPost = () => {
 
   useEffect(() => {
     if (article) {
+      // Track page view and article engagement
+      trackPageView(`/blog/${slug}`);
+      trackEvent({
+        event_type: 'article_view',
+        page_path: `/blog/${slug}`,
+        event_data: {
+          article_id: article.id,
+          article_title: article.title,
+          category: article.category
+        }
+      });
+
       // Increment view count
       supabase
         .from('articles')
@@ -51,7 +65,7 @@ const BlogPost = () => {
         .eq('id', article.id)
         .then();
     }
-  }, [article]);
+  }, [article, slug, trackPageView, trackEvent]);
 
   const handleShare = () => {
     if (navigator.share) {

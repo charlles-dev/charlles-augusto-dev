@@ -5,6 +5,8 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import AdminStats from './AdminStats';
+import { AnalyticsDashboard } from './AnalyticsDashboard';
+import { UserJourneyVisualization } from './UserJourneyVisualization';
 import { Bell, Settings, Download, RefreshCw, Filter } from 'lucide-react';
 import { useQuery } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
@@ -98,11 +100,12 @@ const AdminDashboard: React.FC = () => {
 
       {/* Main Content Tabs */}
       <Tabs value={activeTab} onValueChange={setActiveTab} className="space-y-6">
-        <TabsList className="grid w-full grid-cols-4">
+        <TabsList className="grid w-full grid-cols-5">
           <TabsTrigger value="overview">Visão Geral</TabsTrigger>
+          <TabsTrigger value="analytics">Analytics</TabsTrigger>
+          <TabsTrigger value="journey">Jornada</TabsTrigger>
           <TabsTrigger value="messages">Mensagens</TabsTrigger>
           <TabsTrigger value="testimonials">Depoimentos</TabsTrigger>
-          <TabsTrigger value="analytics">Analytics</TabsTrigger>
         </TabsList>
 
         <TabsContent value="overview" className="space-y-6">
@@ -256,16 +259,11 @@ const AdminDashboard: React.FC = () => {
         </TabsContent>
 
         <TabsContent value="analytics">
-          <Card>
-            <CardHeader>
-              <CardTitle>Analytics e Métricas</CardTitle>
-            </CardHeader>
-            <CardContent>
-              <p className="text-muted-foreground">
-                Gráficos e métricas detalhadas serão implementados aqui.
-              </p>
-            </CardContent>
-          </Card>
+          <AnalyticsDashboard />
+        </TabsContent>
+
+        <TabsContent value="journey">
+          <UserJourneyVisualization />
         </TabsContent>
       </Tabs>
     </div>
