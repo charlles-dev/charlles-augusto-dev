@@ -11,8 +11,11 @@ import { Label } from '@/components/ui/label';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { toast } from 'sonner';
-import { Pencil, Trash2, Plus, Eye, FileText, Heart } from 'lucide-react';
+import { Pencil, Trash2, Plus, Eye, FileText, Heart, History, Image as ImageIcon } from 'lucide-react';
 import { MarkdownEditor } from './MarkdownEditor';
+import { ArticlePreview } from './ArticlePreview';
+import { ArticleVersionHistory } from './ArticleVersionHistory';
+import { MediaLibrary } from './MediaLibrary';
 
 interface Article {
   id: string;
@@ -37,6 +40,9 @@ interface Article {
 export const BlogManager = () => {
   const [selectedArticle, setSelectedArticle] = useState<Article | null>(null);
   const [isDialogOpen, setIsDialogOpen] = useState(false);
+  const [previewArticle, setPreviewArticle] = useState<Article | null>(null);
+  const [showVersionHistory, setShowVersionHistory] = useState(false);
+  const [versionArticleId, setVersionArticleId] = useState<string | null>(null);
   const queryClient = useQueryClient();
 
   const { data: articles, isLoading } = useQuery({
@@ -215,6 +221,39 @@ export const BlogManager = () => {
           ))}
         </div>
       )}
+      
+      {previewArticle && (
+        <ArticlePreview
+          article={previewArticle}
+          open={!!previewArticle}
+          onOpenChange={(open) => !open && setPreviewArticle(null)}
+        />
+      )}
+      
+      {versionArticleId && (
+        <ArticleVersionHistory
+          articleId={versionArticleId}
+          open={showVersionHistory}
+          onOpenChange={setShowVersionHistory}
+          onRestore={(version) => {
+            setSelectedArticle({
+              id: versionArticleId,
+              title: version.title,
+              content: version.content,
+              excerpt: version.excerpt,
+              slug: '',
+              category: '',
+              tags: [],
+              is_published: false,
+              is_featured: false,
+              views_count: 0,
+              likes_count: 0,
+              created_at: new Date().toISOString(),
+            } as Article);
+            setIsDialogOpen(true);
+          }}
+        />
+      )}
     </div>
   );
 };
@@ -232,8 +271,45 @@ const ArticleForm = ({ article, onClose }: { article: Article | null; onClose: (
     seo_title: article?.seo_title || '',
     seo_description: article?.seo_description || '',
   });
+  const [showMediaLibrary, setShowMediaLibrary] = useState(false);
+  const [showPreview, setShowPreview] = useState(false);
 
   const queryClient = useQueryClient();
+
+  const saveVersionMutation = useMutation({
+    mutationFn: async (articleData: any) => {
+      if (!article?.id) return;
+      
+      const { data: existingVersions } = await supabase
+        .from('article_versions')
+        .select('version_number')
+        .eq('article_id', article.id)
+        .order('version_number', { ascending: false })
+        .limit(1);
+      
+      const nextVersion = existingVersions && existingVersions.length > 0 
+        ? existingVersions[0].version_number + 1 
+        : 1;
+      
+      const { error } = await supabase
+        .from('article_versions')
+        .insert({
+          article_id: article.id,
+          title: articleData.title,
+          content: articleData.content,
+          excerpt: articleData.excerpt,
+          featured_image: articleData.featured_image,
+          category: articleData.category,
+          tags: articleData.tags,
+          seo_title: articleData.seo_title,
+          seo_description: articleData.seo_description,
+          version_number: nextVersion,
+          change_summary: 'Atualização manual',
+        });
+      
+      if (error) throw error;
+    },
+  });
 
   const saveMutation = useMutation({
     mutationFn: async (data: typeof formData) => {
@@ -245,6 +321,9 @@ const ArticleForm = ({ article, onClose }: { article: Article | null; onClose: (
       };
 
       if (article) {
+        // Save version before updating
+        await saveVersionMutation.mutateAsync(payload);
+        
         const { error } = await supabase
           .from('articles')
           .update(payload)
@@ -339,11 +418,20 @@ const ArticleForm = ({ article, onClose }: { article: Article | null; onClose: (
         </div>
         <div>
           <Label>Featured Image URL</Label>
-          <Input
-            value={formData.featured_image}
-            onChange={(e) => setFormData({ ...formData, featured_image: e.target.value })}
-            placeholder="https://example.com/image.jpg"
-          />
+          <div className="flex gap-2">
+            <Input
+              value={formData.featured_image}
+              onChange={(e) => setFormData({ ...formData, featured_image: e.target.value })}
+              placeholder="https://example.com/image.jpg"
+            />
+            <Button
+              type="button"
+              variant="outline"
+              onClick={() => setShowMediaLibrary(true)}
+            >
+              <ImageIcon className="w-4 h-4" />
+            </Button>
+          </div>
         </div>
       </TabsContent>
 
@@ -367,15 +455,42 @@ const ArticleForm = ({ article, onClose }: { article: Article | null; onClose: (
         </div>
       </TabsContent>
 
-      <div className="flex justify-end gap-2">
-        <Button variant="outline" onClick={onClose}>Cancel</Button>
+      <div className="flex justify-between gap-2">
         <Button 
-          onClick={() => saveMutation.mutate(formData)}
-          disabled={!formData.title || !formData.excerpt || !formData.content || !formData.category}
+          type="button"
+          variant="outline" 
+          onClick={() => setShowPreview(true)}
         >
-          {article ? 'Update' : 'Create'}
+          <Eye className="w-4 h-4 mr-2" />
+          Preview
         </Button>
+        <div className="flex gap-2">
+          <Button variant="outline" onClick={onClose}>Cancel</Button>
+          <Button 
+            onClick={() => saveMutation.mutate(formData)}
+            disabled={!formData.title || !formData.excerpt || !formData.content || !formData.category}
+          >
+            {article ? 'Update' : 'Create'}
+          </Button>
+        </div>
       </div>
+      
+      <MediaLibrary
+        open={showMediaLibrary}
+        onOpenChange={setShowMediaLibrary}
+        onSelect={(url) => setFormData({ ...formData, featured_image: url })}
+      />
+      
+      {showPreview && (
+        <ArticlePreview
+          article={{
+            ...formData,
+            tags: formData.tags.split(',').map(t => t.trim()).filter(Boolean),
+          }}
+          open={showPreview}
+          onOpenChange={setShowPreview}
+        />
+      )}
     </Tabs>
   );
 };

@@ -115,6 +115,65 @@ export type Database = {
         }
         Relationships: []
       }
+      article_versions: {
+        Row: {
+          article_id: string
+          category: string
+          change_summary: string | null
+          content: string
+          created_at: string
+          created_by: string | null
+          excerpt: string
+          featured_image: string | null
+          id: string
+          seo_description: string | null
+          seo_title: string | null
+          tags: string[] | null
+          title: string
+          version_number: number
+        }
+        Insert: {
+          article_id: string
+          category: string
+          change_summary?: string | null
+          content: string
+          created_at?: string
+          created_by?: string | null
+          excerpt: string
+          featured_image?: string | null
+          id?: string
+          seo_description?: string | null
+          seo_title?: string | null
+          tags?: string[] | null
+          title: string
+          version_number: number
+        }
+        Update: {
+          article_id?: string
+          category?: string
+          change_summary?: string | null
+          content?: string
+          created_at?: string
+          created_by?: string | null
+          excerpt?: string
+          featured_image?: string | null
+          id?: string
+          seo_description?: string | null
+          seo_title?: string | null
+          tags?: string[] | null
+          title?: string
+          version_number?: number
+        }
+        Relationships: [
+          {
+            foreignKeyName: "article_versions_article_id_fkey"
+            columns: ["article_id"]
+            isOneToOne: false
+            referencedRelation: "articles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       articles: {
         Row: {
           category: string
@@ -316,6 +375,48 @@ export type Database = {
           technologies?: string[] | null
           title?: string
           updated_at?: string
+        }
+        Relationships: []
+      }
+      media_library: {
+        Row: {
+          alt_text: string | null
+          caption: string | null
+          created_at: string
+          file_size: number
+          file_type: string
+          filename: string
+          folder: string | null
+          id: string
+          updated_at: string
+          uploaded_by: string | null
+          url: string
+        }
+        Insert: {
+          alt_text?: string | null
+          caption?: string | null
+          created_at?: string
+          file_size: number
+          file_type: string
+          filename: string
+          folder?: string | null
+          id?: string
+          updated_at?: string
+          uploaded_by?: string | null
+          url: string
+        }
+        Update: {
+          alt_text?: string | null
+          caption?: string | null
+          created_at?: string
+          file_size?: number
+          file_type?: string
+          filename?: string
+          folder?: string | null
+          id?: string
+          updated_at?: string
+          uploaded_by?: string | null
+          url?: string
         }
         Relationships: []
       }

@@ -15,6 +15,9 @@ import {
   Star,
   StarOff,
   Trash2,
+  Download,
+  Archive,
+  FolderOpen,
 } from 'lucide-react';
 
 interface BulkActionsBarProps {
@@ -25,6 +28,9 @@ interface BulkActionsBarProps {
   onMarkFeatured: (ids: string[]) => void;
   onRemoveFeatured: (ids: string[]) => void;
   onDelete: (ids: string[]) => void;
+  onExport?: (ids: string[]) => void;
+  onArchive?: (ids: string[]) => void;
+  onChangeCategory?: (ids: string[], category: string) => void;
 }
 
 export const BulkActionsBar: React.FC<BulkActionsBarProps> = ({
@@ -35,6 +41,9 @@ export const BulkActionsBar: React.FC<BulkActionsBarProps> = ({
   onMarkFeatured,
   onRemoveFeatured,
   onDelete,
+  onExport,
+  onArchive,
+  onChangeCategory,
 }) => {
   const { t } = useTranslation();
 
@@ -80,6 +89,18 @@ export const BulkActionsBar: React.FC<BulkActionsBarProps> = ({
               <StarOff className="h-4 w-4 mr-2" />
               {t('admin.removeFromFeatured')}
             </DropdownMenuItem>
+            {onExport && (
+              <DropdownMenuItem onClick={() => onExport(selectedItems)}>
+                <Download className="h-4 w-4 mr-2" />
+                Exportar
+              </DropdownMenuItem>
+            )}
+            {onArchive && (
+              <DropdownMenuItem onClick={() => onArchive(selectedItems)}>
+                <Archive className="h-4 w-4 mr-2" />
+                Arquivar
+              </DropdownMenuItem>
+            )}
             <DropdownMenuItem
               onClick={() => onDelete(selectedItems)}
               className="text-destructive"
@@ -89,6 +110,31 @@ export const BulkActionsBar: React.FC<BulkActionsBarProps> = ({
             </DropdownMenuItem>
           </DropdownMenuContent>
         </DropdownMenu>
+        
+        {onChangeCategory && (
+          <DropdownMenu>
+            <DropdownMenuTrigger asChild>
+              <Button variant="ghost" size="sm" className="h-8 px-2">
+                <FolderOpen className="h-4 w-4 mr-1" />
+                Categoria
+              </Button>
+            </DropdownMenuTrigger>
+            <DropdownMenuContent>
+              <DropdownMenuItem onClick={() => onChangeCategory(selectedItems, 'tecnologia')}>
+                Tecnologia
+              </DropdownMenuItem>
+              <DropdownMenuItem onClick={() => onChangeCategory(selectedItems, 'design')}>
+                Design
+              </DropdownMenuItem>
+              <DropdownMenuItem onClick={() => onChangeCategory(selectedItems, 'negócios')}>
+                Negócios
+              </DropdownMenuItem>
+              <DropdownMenuItem onClick={() => onChangeCategory(selectedItems, 'marketing')}>
+                Marketing
+              </DropdownMenuItem>
+            </DropdownMenuContent>
+          </DropdownMenu>
+        )}
       </div>
     </div>
   );

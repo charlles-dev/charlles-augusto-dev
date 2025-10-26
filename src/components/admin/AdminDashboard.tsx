@@ -7,7 +7,7 @@ import { Badge } from '@/components/ui/badge';
 import AdminStats from './AdminStats';
 import { AnalyticsDashboard } from './AnalyticsDashboard';
 import { UserJourneyVisualization } from './UserJourneyVisualization';
-import { Bell, Settings, Download, RefreshCw, Filter } from 'lucide-react';
+import { Bell, Settings, Download, RefreshCw, Filter, Eye, Heart, FileText, TrendingUp } from 'lucide-react';
 import { useQuery } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
 
@@ -21,7 +21,8 @@ const AdminDashboard: React.FC = () => {
       const [
         { data: recentMessages },
         { data: recentTestimonials },
-        { data: recentSubscribers }
+        { data: recentSubscribers },
+        { data: articlesStats }
       ] = await Promise.all([
         supabase.from('contact_messages')
           .select('*')
@@ -34,13 +35,26 @@ const AdminDashboard: React.FC = () => {
         supabase.from('newsletter_subscribers')
           .select('*')
           .order('subscribed_at', { ascending: false })
-          .limit(5)
+          .limit(5),
+        supabase.from('articles')
+          .select('views_count, likes_count')
       ]);
+
+      const totalViews = articlesStats?.reduce((sum, article) => sum + article.views_count, 0) || 0;
+      const totalLikes = articlesStats?.reduce((sum, article) => sum + article.likes_count, 0) || 0;
+      const totalArticles = articlesStats?.length || 0;
+      const avgEngagement = totalArticles > 0 ? ((totalLikes / totalViews) * 100).toFixed(1) : '0';
 
       return {
         messages: recentMessages || [],
         testimonials: recentTestimonials || [],
         subscribers: recentSubscribers || [],
+        blogStats: {
+          totalViews,
+          totalLikes,
+          totalArticles,
+          avgEngagement,
+        },
       };
     },
   });
@@ -109,6 +123,89 @@ const AdminDashboard: React.FC = () => {
         </TabsList>
 
         <TabsContent value="overview" className="space-y-6">
+          {/* Blog Stats Cards */}
+          <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
+            <motion.div
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ delay: 0.1 }}
+            >
+              <Card>
+                <CardContent className="pt-6">
+                  <div className="flex items-center justify-between">
+                    <div>
+                      <p className="text-sm text-muted-foreground">Total de Views</p>
+                      <p className="text-2xl font-bold">
+                        {recentActivity?.blogStats.totalViews.toLocaleString() || '0'}
+                      </p>
+                    </div>
+                    <Eye className="w-8 h-8 text-primary opacity-50" />
+                  </div>
+                </CardContent>
+              </Card>
+            </motion.div>
+
+            <motion.div
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ delay: 0.2 }}
+            >
+              <Card>
+                <CardContent className="pt-6">
+                  <div className="flex items-center justify-between">
+                    <div>
+                      <p className="text-sm text-muted-foreground">Total de Likes</p>
+                      <p className="text-2xl font-bold">
+                        {recentActivity?.blogStats.totalLikes.toLocaleString() || '0'}
+                      </p>
+                    </div>
+                    <Heart className="w-8 h-8 text-destructive opacity-50" />
+                  </div>
+                </CardContent>
+              </Card>
+            </motion.div>
+
+            <motion.div
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ delay: 0.3 }}
+            >
+              <Card>
+                <CardContent className="pt-6">
+                  <div className="flex items-center justify-between">
+                    <div>
+                      <p className="text-sm text-muted-foreground">Artigos</p>
+                      <p className="text-2xl font-bold">
+                        {recentActivity?.blogStats.totalArticles || '0'}
+                      </p>
+                    </div>
+                    <FileText className="w-8 h-8 text-accent opacity-50" />
+                  </div>
+                </CardContent>
+              </Card>
+            </motion.div>
+
+            <motion.div
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ delay: 0.4 }}
+            >
+              <Card>
+                <CardContent className="pt-6">
+                  <div className="flex items-center justify-between">
+                    <div>
+                      <p className="text-sm text-muted-foreground">Engajamento</p>
+                      <p className="text-2xl font-bold">
+                        {recentActivity?.blogStats.avgEngagement || '0'}%
+                      </p>
+                    </div>
+                    <TrendingUp className="w-8 h-8 text-green-500 opacity-50" />
+                  </div>
+                </CardContent>
+              </Card>
+            </motion.div>
+          </div>
+
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
             {/* Recent Messages */}
             <Card>
