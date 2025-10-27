@@ -1,6 +1,7 @@
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { Badge } from "@/components/ui/badge";
 import { Calendar, Clock, Tag } from "lucide-react";
+import { createSafeHTML } from "@/utils/sanitizeHTML";
 
 interface ArticlePreviewProps {
   article: {
@@ -64,8 +65,12 @@ export function ArticlePreview({ article, open, onOpenChange }: ArticlePreviewPr
             
             <div 
               className="prose prose-lg max-w-none dark:prose-invert"
-              dangerouslySetInnerHTML={{ __html: article.content }}
+              dangerouslySetInnerHTML={createSafeHTML(article.content)}
             />
+            
+            <div className="text-xs text-muted-foreground border-t pt-4 mt-4">
+              <p>⚠️ Nota: O conteúdo HTML é sanitizado para prevenir ataques XSS</p>
+            </div>
           </div>
           
           {(article.seo_title || article.seo_description) && (

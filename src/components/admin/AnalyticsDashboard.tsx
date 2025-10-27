@@ -79,8 +79,18 @@ export const AnalyticsDashboard = () => {
         .gte('created_at', last30Days);
 
       const sourceCounts = referrers?.reduce((acc, { referrer }) => {
-        const source = referrer ? new URL(referrer).hostname : 'Direct';
-        acc[source] = (acc[source] || 0) + 1;
+        try {
+          if (referrer) {
+            const url = new URL(referrer);
+            const source = url.hostname || 'Direct';
+            acc[source] = (acc[source] || 0) + 1;
+          } else {
+            acc['Direct'] = (acc['Direct'] || 0) + 1;
+          }
+        } catch (e) {
+          // Invalid URL, count as Direct
+          acc['Direct'] = (acc['Direct'] || 0) + 1;
+        }
         return acc;
       }, {} as Record<string, number>);
 

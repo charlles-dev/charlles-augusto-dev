@@ -75,19 +75,23 @@ export const ThemeCustomizer = () => {
     const saved = localStorage.getItem('custom-theme');
     return saved ? JSON.parse(saved) : defaultScheme;
   });
+  const [isInitialLoad, setIsInitialLoad] = useState(true);
 
-  const applyColors = (colors: ColorScheme) => {
+  const applyColors = (colors: ColorScheme, showToast: boolean = true) => {
     const root = document.documentElement;
     Object.entries(colors).forEach(([key, value]) => {
       root.style.setProperty(`--${key}`, value);
     });
     localStorage.setItem('custom-theme', JSON.stringify(colors));
     setCustomColors(colors);
-    toast.success('Theme applied successfully!');
+    
+    if (showToast) {
+      toast.success('Theme applied successfully!');
+    }
   };
 
   const resetToDefault = () => {
-    applyColors(defaultScheme);
+    applyColors(defaultScheme, true);
     toast.info('Theme reset to default');
   };
 
@@ -97,8 +101,11 @@ export const ThemeCustomizer = () => {
   };
 
   useEffect(() => {
-    // Apply saved theme on mount
-    applyColors(customColors);
+    // Apply saved theme on mount without showing toast
+    if (isInitialLoad) {
+      applyColors(customColors, false);
+      setIsInitialLoad(false);
+    }
   }, []);
 
   return (

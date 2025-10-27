@@ -7,6 +7,7 @@ import { Badge } from '@/components/ui/badge';
 import AdminStats from './AdminStats';
 import { AnalyticsDashboard } from './AnalyticsDashboard';
 import { UserJourneyVisualization } from './UserJourneyVisualization';
+import { NotificationBell } from './NotificationBell';
 import { Bell, Settings, Download, RefreshCw, Filter, Eye, Heart, FileText, TrendingUp } from 'lucide-react';
 import { useQuery } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
@@ -83,6 +84,8 @@ const AdminDashboard: React.FC = () => {
         </div>
         
         <div className="flex gap-2">
+          <NotificationBell />
+          
           <Button
             variant="outline"
             onClick={handleRefresh}

@@ -45,9 +45,19 @@ const Blog = () => {
     hasNextPage,
     isFetchingNextPage,
     isLoading,
+    error,
+    refetch,
   } = useInfiniteQuery({
     queryKey: ['articles', searchQuery, filters],
     queryFn: async ({ pageParam = 0 }) => {
+      // Track search if there's a query
+      if (searchQuery) {
+        await supabase.from('search_analytics').insert({
+          search_term: searchQuery,
+          results_count: 0, // Will be updated after we get results
+        });
+      }
+
       let query = supabase
         .from('articles')
         .select('*', { count: 'exact' })
@@ -80,6 +90,15 @@ const Blog = () => {
 
       const { data, error, count } = await query;
       if (error) throw error;
+      
+      // Update search analytics with results count
+      if (searchQuery && count !== null) {
+        await supabase.from('search_analytics').insert({
+          search_term: searchQuery,
+          results_count: count,
+        });
+      }
+      
       return { data, count };
     },
     getNextPageParam: (lastPage, allPages) => {
@@ -87,6 +106,7 @@ const Blog = () => {
       return lastPage.count && nextPage < lastPage.count ? nextPage : undefined;
     },
     initialPageParam: 0,
+    retry: 2, // Retry failed requests twice
   });
 
   const articles = data?.pages.flatMap(page => page.data) || [];
@@ -156,6 +176,16 @@ const Blog = () => {
           <div className="max-w-4xl mx-auto space-y-6">
             {isLoading ? (
               <BlogSkeletonList count={6} />
+            ) : error ? (
+              <div className="text-center py-12">
+                <p className="text-destructive mb-4">Erro ao carregar artigos</p>
+                <button 
+                  onClick={() => refetch()}
+                  className="px-4 py-2 bg-primary text-primary-foreground rounded-md hover:bg-primary/90"
+                >
+                  Tentar novamente
+                </button>
+              </div>
             ) : articles.length === 0 ? (
               <div className="text-center py-12">
                 <p className="text-muted-foreground">{t('blog.noArticles', 'No articles found')}</p>

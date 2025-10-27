@@ -70,10 +70,18 @@ export function MediaLibrary({ open, onOpenChange, onSelect }: MediaLibraryProps
 
   const uploadMutation = useMutation({
     mutationFn: async (files: File[]) => {
+      // Validate folder selection
+      const targetFolder = selectedFolder === 'all' ? 'uncategorized' : selectedFolder;
+      
       const uploadPromises = files.map(async (file) => {
+        // Validate file size (max 10MB)
+        if (file.size > 10 * 1024 * 1024) {
+          throw new Error(`Arquivo ${file.name} excede o tamanho máximo de 10MB`);
+        }
+
         const fileExt = file.name.split('.').pop();
         const fileName = `${Math.random()}.${fileExt}`;
-        const filePath = `${selectedFolder}/${fileName}`;
+        const filePath = `${targetFolder}/${fileName}`;
 
         const { error: uploadError, data } = await supabase.storage
           .from('project-images')
@@ -90,7 +98,7 @@ export function MediaLibrary({ open, onOpenChange, onSelect }: MediaLibraryProps
           url: publicUrl,
           file_type: file.type,
           file_size: file.size,
-          folder: selectedFolder === 'all' ? 'uncategorized' : selectedFolder,
+          folder: targetFolder,
         });
 
         return publicUrl;
