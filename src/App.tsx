@@ -8,11 +8,14 @@ import { HelmetProvider } from "react-helmet-async";
 import { ErrorBoundary } from "@/components/ErrorBoundary";
 import { PageTransition } from "@/components/ui/page-transition";
 import { NotificationProvider } from "@/components/ui/notification-system";
+import { AdminRoute } from "@/components/AdminRoute";
 
 // Lazy load pages for better performance
 const Index = React.lazy(() => import("./pages/Index"));
 const Auth = React.lazy(() => import("./pages/Auth"));
 const Admin = React.lazy(() => import("./pages/Admin"));
+const Blog = React.lazy(() => import("./pages/Blog"));
+const BlogPost = React.lazy(() => import("./pages/BlogPost"));
 const NotFound = React.lazy(() => import("./pages/NotFound"));
 
 const queryClient = new QueryClient();
@@ -38,10 +41,22 @@ const AppRoutes = () => (
             <Auth />
           </PageTransition>
         } />
-        <Route path="/admin" element={
+        <Route path="/blog" element={
           <PageTransition>
-            <Admin />
+            <Blog />
           </PageTransition>
+        } />
+        <Route path="/blog/:slug" element={
+          <PageTransition>
+            <BlogPost />
+          </PageTransition>
+        } />
+        <Route path="/admin" element={
+          <AdminRoute>
+            <PageTransition>
+              <Admin />
+            </PageTransition>
+          </AdminRoute>
         } />
         <Route path="*" element={
           <PageTransition>
