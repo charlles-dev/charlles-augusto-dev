@@ -3,7 +3,7 @@ import { supabase } from '@/lib/supabase';
 import { toast } from 'sonner';
 import { useTranslation } from 'react-i18next';
 
-export const useAdminActions = (table: 'projects' | 'education' | 'experiences') => {
+export const useAdminActions = (table: 'projects' | 'education' | 'experiences' | 'articles') => {
   const { t } = useTranslation();
 
   const duplicateItem = useCallback(async (id: string) => {

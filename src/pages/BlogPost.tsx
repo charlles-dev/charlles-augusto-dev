@@ -14,7 +14,11 @@ import { CommentsSection } from '@/components/blog/CommentsSection';
 import { RelatedArticles } from '@/components/blog/RelatedArticles';
 import { Breadcrumbs } from '@/components/ui/breadcrumbs';
 import { ArticleReactions } from '@/components/blog/ArticleReactions';
+import { ReadingProgress } from '@/components/blog/ReadingProgress';
+import { TableOfContents } from '@/components/blog/TableOfContents';
 import { usePageSEO } from '@/hooks/usePageSEO';
+import { parseMarkdownToHTML } from '@/utils/markdown';
+import { createSafeHTML } from '@/utils/sanitizeHTML';
 
 const BlogPost = () => {
   const { slug } = useParams<{ slug: string }>();
@@ -105,6 +109,8 @@ const BlogPost = () => {
     );
   }
 
+  const htmlContent = parseMarkdownToHTML(article?.content || '');
+
   return (
     <>
       <SEO 
@@ -114,11 +120,14 @@ const BlogPost = () => {
         image={article.featured_image}
         type="article"
       />
+      <ReadingProgress />
       <div className="min-h-screen bg-gradient-bg">
         <Navigation />
         
-        <article className="container mx-auto px-4 pt-24 pb-12 max-w-4xl">
-          <Breadcrumbs 
+        <div className="container mx-auto px-4 pt-24 pb-12">
+          <div className="max-w-7xl mx-auto grid grid-cols-1 lg:grid-cols-12 gap-8">
+            <article className="lg:col-span-8">
+              <Breadcrumbs
             items={[
               { label: 'Blog', href: '/blog' },
               { label: article.category, href: `/blog?category=${article.category}` },
@@ -190,27 +199,33 @@ const BlogPost = () => {
             )}
           </header>
 
-          {article.featured_image && (
-            <img 
-              src={article.featured_image} 
-              alt={article.title}
-              className="w-full h-96 object-cover rounded-lg mb-8"
-            />
-          )}
+              {article.featured_image && (
+                <img 
+                  src={article.featured_image} 
+                  alt={article.title}
+                  className="w-full h-96 object-cover rounded-lg mb-8"
+                />
+              )}
 
-          <div 
-            className="prose prose-lg dark:prose-invert max-w-none mb-12"
-            dangerouslySetInnerHTML={{ __html: article.content }}
-          />
+              <div 
+                className="prose prose-lg dark:prose-invert max-w-none mb-12"
+                dangerouslySetInnerHTML={createSafeHTML(htmlContent)}
+              />
 
-          <Separator className="my-12" />
+              <Separator className="my-12" />
 
-          <RelatedArticles currentArticleId={article.id} category={article.category} />
+              <RelatedArticles currentArticleId={article.id} category={article.category} />
 
-          <Separator className="my-12" />
+              <Separator className="my-12" />
 
-          <CommentsSection articleId={article.id} />
-        </article>
+              <CommentsSection articleId={article.id} />
+            </article>
+            
+            <aside className="lg:col-span-4">
+              <TableOfContents content={htmlContent} />
+            </aside>
+          </div>
+        </div>
       </div>
     </>
   );
